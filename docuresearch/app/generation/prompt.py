@@ -255,7 +255,10 @@ relevant information for this question."""
 
     limited = passages[:max_passages]
     parts = [
-        "## Retrieved Passages\n\nThe following passages were retrieved as potentially relevant source material. Each passage includes its document name, location, and text. Use these as your ONLY source material for answering the question.",
+        "## Retrieved Passages\n\n"
+        "The following passages were retrieved as potentially relevant source material. "
+        "Each passage includes its document name, location, and text. "
+        "Use these as your ONLY source material for answering the question.",
     ]
     for i, p in enumerate(limited, 1):
         parts.append(
@@ -295,7 +298,11 @@ def _section_5_conversation(
 
 This is the first turn in the conversation. No prior context is available."""
 
-    parts = ["## Conversation Context\n\nThis question is part of an ongoing conversation. Previous turns are provided for context:"]
+    parts = [
+        "## Conversation Context\n\n"
+        "This question is part of an ongoing conversation. "
+        "Previous turns are provided for context:"
+    ]
     for turn in history:
         parts.append(
             f"\n--- Turn {turn.turn_index} ---\n"
@@ -305,6 +312,7 @@ This is the first turn in the conversation. No prior context is available."""
         )
     parts.append(
         "\nUse the conversation history to maintain consistency with prior answers. "
-        "Do not contradict earlier answers unless the retrieved passages clearly support a different conclusion."
+        "Do not contradict earlier answers unless the retrieved passages clearly support "
+        "a different conclusion."
     )
     return "\n".join(parts)

@@ -129,7 +129,8 @@ def create_passage(conn: sqlite3.Connection, passage: Passage) -> Passage:
         embedding_blob = json.dumps(passage.embedding)
 
     conn.execute(
-        """INSERT INTO passages (id, document_id, text, location, start_offset, end_offset, embedding)
+        """INSERT INTO passages
+               (id, document_id, text, location, start_offset, end_offset, embedding)
            VALUES (?, ?, ?, ?, ?, ?, ?)""",
         (
             passage.id,

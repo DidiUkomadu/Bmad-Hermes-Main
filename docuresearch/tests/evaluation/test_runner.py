@@ -297,7 +297,7 @@ class TestRetrievalMetrics:
 
     def test_recall_insufficient_evidence_no_gold(self, sample_questions):
         """For insufficient-evidence questions with no gold passages,
-        recall is 1.0 if nothing retrieved, 0.0 if something was."""
+        recall is N/A (None) regardless of what was retrieved."""
         q = sample_questions[1]  # insufficient_evidence
         mock = MockSystem(
             retrieval_results={
@@ -317,9 +317,9 @@ class TestRetrievalMetrics:
         runner = EvaluationRunner()
         result = runner._run_one(q, mock)
 
-        assert result.retrieval_recall == 1.0  # vacuously correct
+        assert result.retrieval_recall is None  # N/A: no gold passages
 
-    def test_precision_None_for_no_gold_passages(self, sample_questions):
+    def test_precision_none_for_no_gold_passages(self, sample_questions):
         """For insufficient-evidence questions, precision is None (N/A)."""
         q = sample_questions[1]
         mock = MockSystem(
@@ -395,7 +395,7 @@ class TestCitationCorrectness:
 
         assert result.citation_correctness == 1.0
 
-    def test_no_citations_NA(self, sample_questions):
+    def test_no_citations_na(self, sample_questions):
         q = sample_questions[0]
         mock = MockSystem(
             retrieval_results={q.text: []},
@@ -547,7 +547,7 @@ class TestConflictHandling:
 
         assert result.conflict_handled is False
 
-    def test_NA_for_non_conflicting_questions(self, sample_questions):
+    def test_na_for_non_conflicting_questions(self, sample_questions):
         q = sample_questions[0]  # single_source
         mock = MockSystem(
             retrieval_results={q.text: []},
@@ -744,3 +744,98 @@ class TestStoreBackedSystemFixes:
                 f"Citation document_name={doc_name!r} looks like a raw ID, not a document name."
             )
 
+
+
+class TestEquivalentPassagesAndConflictCitations:
+    """Equivalent gold passages and citation-based conflict surfacing."""
+
+    @staticmethod
+    def _question_with_equivalent() -> EvaluationQuestion:
+        return EvaluationQuestion(
+            id="q-eq",
+            text="What encryption?",
+            type=QuestionType.SINGLE_SOURCE,
+            gold_answer="AES-256.",
+            gold_passages=[
+                GoldPassage(
+                    passage_id="spec-pdf:page:1:chunk:0",
+                    document_id="spec-pdf",
+                    document_name="spec.pdf",
+                    location="page:1",
+                    claim="AES-256.",
+                    equivalent_passage_ids=["spec-md:Security:chunk:1"],
+                )
+            ],
+        )
+
+    def test_equivalent_passage_counts_for_retrieval_and_citation(self):
+        q = self._question_with_equivalent()
+        mock = MockSystem(
+            retrieval_results={q.text: [{"passage_id": "spec-md:Security:chunk:1", "score": 1.0}]},
+            generation_output={
+                q.text: {
+                    "answer": "AES-256.",
+                    "citations": [{"passage_id": "spec-md:Security:chunk:1"}],
+                    "evidence_quality": "sufficient",
+                    "evidence_narrative": "",
+                    "abstention": False,
+                }
+            },
+        )
+        result = EvaluationRunner()._run_one(q, mock)
+        assert result.retrieval_precision == 1.0
+        assert result.retrieval_recall == 1.0
+        assert result.citation_correctness == 1.0
+
+    def test_retrieving_both_copies_counts_gold_once(self):
+        q = self._question_with_equivalent()
+        mock = MockSystem(retrieval_results={q.text: [
+            {"passage_id": "spec-pdf:page:1:chunk:0", "score": 1.0},
+            {"passage_id": "spec-md:Security:chunk:1", "score": 0.9},
+        ]})
+        result = EvaluationRunner()._run_one(q, mock)
+        assert result.retrieval_recall == 1.0
+        assert result.retrieval_precision == 1.0
+
+    def test_conflict_surfaced_via_citations_to_both_documents(self, sample_questions):
+        q = sample_questions[2]
+        q.conflicting_sources = [
+            {"source": "Protocol A Spec", "document_name": "test.pdf", "claim": "X"},
+            {"source": "Protocol B Spec", "document_name": "test2.pdf", "claim": "Y"},
+        ]
+        mock = MockSystem(
+            retrieval_results={q.text: []},
+            generation_output={
+                q.text: {
+                    "answer": "One document says X; the other says Y.",
+                    "citations": [
+                        {"passage_id": "doc-001:page:1:chunk:0", "document_name": "test.pdf"},
+                        {"passage_id": "doc-002:page:1:chunk:0", "document_name": "test2.pdf"},
+                    ],
+                    "evidence_quality": "conflicting",
+                    "evidence_narrative": "The documents disagree.",
+                    "abstention": False,
+                }
+            },
+        )
+        assert EvaluationRunner()._run_one(q, mock).conflict_handled is True
+
+    def test_conflict_not_surfaced_when_one_document_missing(self, sample_questions):
+        q = sample_questions[2]
+        q.conflicting_sources = [
+            {"source": "Protocol A Spec", "document_name": "test.pdf", "claim": "X"},
+            {"source": "Protocol B Spec", "document_name": "test2.pdf", "claim": "Y"},
+        ]
+        mock = MockSystem(
+            retrieval_results={q.text: []},
+            generation_output={
+                q.text: {
+                    "answer": "It is X.",
+                    "citations": [{"passage_id": "doc-001:page:1:chunk:0", "document_name": "test.pdf"}],
+                    "evidence_quality": "conflicting",
+                    "evidence_narrative": "",
+                    "abstention": False,
+                }
+            },
+        )
+        assert EvaluationRunner()._run_one(q, mock).conflict_handled is False

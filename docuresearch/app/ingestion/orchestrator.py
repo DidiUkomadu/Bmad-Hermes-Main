@@ -15,7 +15,8 @@ from app.chunking.strategy import ChunkingConfig, chunk_passages
 from app.ingestion.markdown import parse_markdown
 from app.ingestion.pdf import extract_text_from_pdf
 from app.ingestion.text import parse_plain_text
-from app.models import DocumentFormat, RawDocument
+from app.models import DocumentFormat, DocumentMeta, RawDocument
+from app.retrieval.interface import EmbeddingModel
 from app.store.schema import (
     create_document,
     create_passage,
@@ -82,32 +83,26 @@ def detect_format(source: str | Path | bytes) -> DocumentFormat:
 # ---------------------------------------------------------------------------
 
 
-def _ingest_pdf(source: str | Path) -> RawDocument:
-    """Ingest a PDF file and return a RawDocument."""
-    path = Path(source)
-    file_bytes = path.read_bytes()
-    raw = extract_text_from_pdf(file_bytes, path.name)
+def _ingest_pdf(file_bytes: bytes, name: str) -> RawDocument:
+    """Ingest PDF bytes and return a RawDocument."""
+    raw = extract_text_from_pdf(file_bytes, name)
     page_count = len(set(u.get("page_number", 0) for u in raw.units if u.get("page_number")))
     logger.info("Ingested PDF: %s (%d pages, %d chars)",
                 raw.name, page_count, len(raw.full_text))
     return raw
 
 
-def _ingest_markdown(source: str | Path) -> RawDocument:
-    """Ingest a Markdown file and return a RawDocument."""
-    path = Path(source)
-    file_bytes = path.read_bytes()
-    raw = parse_markdown(file_bytes, path.name)
+def _ingest_markdown(file_bytes: bytes, name: str) -> RawDocument:
+    """Ingest Markdown bytes and return a RawDocument."""
+    raw = parse_markdown(file_bytes, name)
     logger.info("Ingested Markdown: %s (%d blocks, %d chars)",
                 raw.name, len(raw.units), len(raw.full_text))
     return raw
 
 
-def _ingest_txt(source: str | Path) -> RawDocument:
-    """Ingest a plain text file and return a RawDocument."""
-    path = Path(source)
-    file_bytes = path.read_bytes()
-    raw = parse_plain_text(file_bytes, path.name)
+def _ingest_txt(file_bytes: bytes, name: str) -> RawDocument:
+    """Ingest plain text bytes and return a RawDocument."""
+    raw = parse_plain_text(file_bytes, name)
     logger.info("Ingested TXT: %s (%d paragraphs, %d chars)",
                 raw.name, len(raw.units), len(raw.full_text))
     return raw
@@ -129,6 +124,7 @@ def ingest_document(
     source: str | Path,
     db_path: str | None = None,
     chunking_config: ChunkingConfig | None = None,
+    embedding_model: EmbeddingModel | None = None,
 ) -> dict[str, Any]:
     """Ingest a document: detect format, parse, chunk, and persist.
 
@@ -141,6 +137,10 @@ def ingest_document(
             uses the currently configured database.
         chunking_config: Optional chunking configuration. Uses defaults
             if not provided.
+        embedding_model: Optional embedding model. When provided, each
+            passage is embedded before persistence so it is available to
+            semantic retrieval. When None, passages are stored without
+            embeddings (keyword retrieval only).
 
     Returns:
         A dict with:
@@ -159,17 +159,73 @@ def ingest_document(
     if not source_path.is_file():
         raise ValueError(f"Source is not a file: {source_path}")
 
+    return _ingest(
+        source_path.read_bytes(),
+        source_path.name,
+        db_path=db_path,
+        chunking_config=chunking_config,
+        embedding_model=embedding_model,
+    )
+
+
+def ingest_document_bytes(
+    source_bytes: bytes,
+    filename: str,
+    db_path: str | None = None,
+    chunking_config: ChunkingConfig | None = None,
+    embedding_model: EmbeddingModel | None = None,
+) -> dict[str, Any]:
+    """Ingest a document from raw bytes with a given filename.
+
+    This is useful for API upload scenarios where the file content
+    comes as bytes rather than a file path. The filename is used for
+    format detection, document naming, and the stable document ID, so
+    uploading the same file yields the same IDs as ingesting it from disk.
+
+    Args:
+        source_bytes: The raw file content.
+        filename: The original filename (used for format detection).
+        db_path: Optional path to the SQLite database.
+        chunking_config: Optional chunking configuration.
+        embedding_model: Optional embedding model (see ingest_document).
+
+    Returns:
+        Same structure as ingest_document().
+    """
+    return _ingest(
+        source_bytes,
+        PurePath(filename).name,
+        db_path=db_path,
+        chunking_config=chunking_config,
+        embedding_model=embedding_model,
+    )
+
+
+def _ingest(
+    file_bytes: bytes,
+    name: str,
+    db_path: str | None,
+    chunking_config: ChunkingConfig | None,
+    embedding_model: EmbeddingModel | None,
+) -> dict[str, Any]:
+    """Shared ingestion path for file and byte sources."""
     # 1. Detect format
-    fmt = detect_format(source_path)
-    logger.info("Detected format '%s' for %s", fmt.value, source_path)
+    fmt = detect_format(name)
+    logger.info("Detected format '%s' for %s", fmt.value, name)
 
     # 2. Ingest with the appropriate handler
-    raw = _HANDLERS[fmt](source_path)
+    raw = _HANDLERS[fmt](file_bytes, name)
 
     # 3. Chunk
     config = chunking_config if chunking_config is not None else ChunkingConfig()
     passages = chunk_passages(raw, config)
     logger.info("Chunked %s into %d passages", raw.name, len(passages))
+
+    # 3b. Embed (optional)
+    if embedding_model is not None:
+        for p in passages:
+            p.embedding = embedding_model.embed(p.text)
+        logger.info("Embedded %d passages for %s", len(passages), raw.name)
 
     # 4. Persist
     if db_path is not None:
@@ -185,7 +241,6 @@ def ingest_document(
     else:
         page_count = None
 
-    from app.models import DocumentMeta
     doc_meta = DocumentMeta(
         id=raw.document_id,
         name=raw.name,
@@ -213,55 +268,6 @@ def ingest_document(
         "passage_ids": passage_ids,
         "db_path": db_path,
     }
-
-
-def ingest_document_bytes(
-    source_bytes: bytes,
-    filename: str,
-    db_path: str | None = None,
-    chunking_config: ChunkingConfig | None = None,
-) -> dict[str, Any]:
-    """Ingest a document from raw bytes with a given filename.
-
-    This is useful for API upload scenarios where the file content
-    comes as bytes rather than a file path. The filename is used for
-    format detection and document naming.
-
-    Args:
-        source_bytes: The raw file content.
-        filename: The original filename (used for format detection).
-        db_path: Optional path to the SQLite database.
-        chunking_config: Optional chunking configuration.
-
-    Returns:
-        Same structure as ingest_document().
-    """
-    fmt = detect_format(filename)
-
-    # Write to a temporary file for the handlers (they expect paths)
-    import tempfile
-    with tempfile.NamedTemporaryFile(
-        suffix=PurePath(filename).suffix,
-        delete=False,
-        mode="wb",
-    ) as tmp:
-        tmp.write(source_bytes)
-        tmp_path = tmp.name
-
-    try:
-        # Set the raw document name from the filename
-        # The handlers will use the temp path as the name; fix it after
-        result = ingest_document(
-            tmp_path,
-            db_path=db_path,
-            chunking_config=chunking_config,
-        )
-        # Override the document_name in the result
-        result["document_name"] = filename
-        return result
-    finally:
-        import os
-        os.unlink(tmp_path)
 
 
 __all__ = [

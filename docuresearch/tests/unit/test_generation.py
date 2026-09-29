@@ -1477,7 +1477,7 @@ class TestEvidenceQualityClassificationHelper:
 # ============================================================================
 
 
-class TestStories44_45_DoNotBreak41_42_43:
+class TestStories44And45DoNotBreak41To43:
     """Verify that Stories 4.4 and 4.5 changes do not break 4.1–4.3 behavior."""
 
     def test_evidence_quality_enum_unchanged(self) -> None:
@@ -1917,11 +1917,6 @@ class TestCitationHelperFunctions:
 
     def test_citation_passage_ids(self, sample_passages: list[RetrievedPassage]) -> None:
         """citation_passage_ids returns ordered list of passage_ids."""
-        ctx = RetrievedContext(
-            query="test",
-            scope={"mode": "all", "document_id": None},
-            passages=sample_passages,
-        )
         answer = GeneratedAnswer(
             answer_text="The answer.",
             citations=[
@@ -1948,11 +1943,6 @@ class TestCitationHelperFunctions:
 
     def test_has_valid_citations_true(self, sample_passages: list[RetrievedPassage]) -> None:
         """has_valid_citations returns True when citations exist."""
-        ctx = RetrievedContext(
-            query="test",
-            scope={"mode": "all", "document_id": None},
-            passages=sample_passages,
-        )
         answer = GeneratedAnswer(
             answer_text="The answer.",
             citations=[

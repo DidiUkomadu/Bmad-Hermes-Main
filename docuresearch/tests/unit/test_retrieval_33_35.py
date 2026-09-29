@@ -218,9 +218,6 @@ class TestHybridConfigurableWeights:
         s_results = hybrid_s.search("AES")
         k_results = hybrid_k.search("AES")
 
-        s_ids = [r.passage_id for r in s_results]
-        k_ids = [r.passage_id for r in k_results]
-
         # The top results may differ with different weightings
         # (not asserting a specific order, just that both produce valid results)
         assert len(s_results) > 0

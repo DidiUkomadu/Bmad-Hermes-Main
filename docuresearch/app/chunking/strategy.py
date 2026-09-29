@@ -112,7 +112,9 @@ def _chunk_by_blocks(
                 "end_offset": unit["end_offset"],
             }
         elif loc == current_block["location"]:
-            current_block["text"] += text
+            # Same separator the handlers use in full_text, so block text
+            # stays consistent with offsets and words never run together.
+            current_block["text"] += "\n\n" + text
             current_block["end_offset"] = unit["end_offset"]
         else:
             blocks.append(current_block)

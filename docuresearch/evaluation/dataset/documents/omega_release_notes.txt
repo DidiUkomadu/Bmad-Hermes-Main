@@ -1,0 +1,5 @@
+Omega Framework Release Notes
+
+These notes record the release milestones of the Omega Framework.
+
+Version 1.0 of the Omega Framework was first released to the public in March 2018.

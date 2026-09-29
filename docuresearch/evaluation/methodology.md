@@ -52,8 +52,10 @@ test material; this methodology provides the scoring rules.
   gold dataset for that question.
 - Formula: `recall = (number of retrieved passages that are in the gold
   relevant set) / (total number of gold relevant passages)`
-- If there are no relevant passages (should not happen for valid questions):
-  recall is 1.0 (vacuously true) — but this case should not arise in the dataset.
+- If there are no relevant passages (insufficient-evidence questions): recall
+  is N/A, like precision. Ranked retrieval always returns its top-N candidates,
+  so an empty result is not a meaningful success signal; these questions are
+  scored on abstention accuracy instead (§2.6).
 
 **Scoring:**
 - Continuous 0–1 value per question.
@@ -176,7 +178,9 @@ and does not silently choose one side.
   questions) / (total conflicting-evidence questions in the dataset).
 
 **What "surfacing the conflict" means in an evaluable way:**
-- The answer text must mention both sources by name (or by document identifier).
+- Each conflicting source must be surfaced: named in the answer text (by name
+  or document identifier), or cited via a passage from that source's document
+  (the `document_name` field on each `conflicting_sources` entry).
 - The answer must state what each source claims about the conflicting point.
 - The evidence quality narration must use the "conflicting" category.
 

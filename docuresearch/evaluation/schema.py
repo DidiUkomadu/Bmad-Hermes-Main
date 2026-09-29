@@ -9,11 +9,11 @@ Defines:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 
-class QuestionType(str, Enum):
+class QuestionType(StrEnum):
     """The five question types from the evaluation methodology (§3)."""
 
     SINGLE_SOURCE = "single_source"
@@ -23,7 +23,7 @@ class QuestionType(str, Enum):
     CONFLICTING_EVIDENCE = "conflicting_evidence"
 
 
-class EvidenceQuality(str, Enum):
+class EvidenceQuality(StrEnum):
     """Evidence quality categories from the PRFAQ/architecture."""
 
     SUFFICIENT = "sufficient"
@@ -42,12 +42,20 @@ class GoldPassage:
         document_name: Human-readable document name.
         location: Page, section, or paragraph locator.
         claim: What this passage supports (specific claim text).
+        equivalent_passage_ids: Passages in other documents carrying the same
+            content (e.g. the Markdown copy of a PDF spec). Retrieving or
+            citing any of them counts as hitting this gold passage.
     """
     passage_id: str
     document_id: str
     document_name: str
     location: str
     claim: str
+    equivalent_passage_ids: list[str] = field(default_factory=list)
+
+    def accepted_ids(self) -> set[str]:
+        """The gold passage ID plus all equivalent passage IDs."""
+        return {self.passage_id, *self.equivalent_passage_ids}
 
 
 @dataclass
@@ -88,6 +96,7 @@ class EvaluationQuestion:
                     "document_name": gp.document_name,
                     "location": gp.location,
                     "claim": gp.claim,
+                    "equivalent_passage_ids": gp.equivalent_passage_ids,
                 }
                 for gp in self.gold_passages
             ],
@@ -196,9 +205,9 @@ class EvaluationResult:
             f"Q={self.question_id}",
             f"faith={self.answer_faithful}",
             f"abs={self.abstention_correct}",
-            f"prec={self.retrieval_precision:.2f}" if self.retrieval_precision is not None else "prec=N/A",
-            f"rec={self.retrieval_recall:.2f}" if self.retrieval_recall is not None else "rec=N/A",
-            f"cit={self.citation_correctness:.2f}" if self.citation_correctness is not None else "cit=N/A",
+            _fmt("prec", self.retrieval_precision),
+            _fmt("rec", self.retrieval_recall),
+            _fmt("cit", self.citation_correctness),
             f"lat={self.total_latency_s:.3f}s",
         ]
         return "  ".join(parts)
@@ -214,3 +223,8 @@ METRIC_NAMES = {
     "conflict_handling": "Conflict Handling",
     "latency": "Response Latency",
 }
+
+
+def _fmt(label: str, value: float | None) -> str:
+    """Format an optional 0–1 metric for summary lines."""
+    return f"{label}={value:.2f}" if value is not None else f"{label}=N/A"

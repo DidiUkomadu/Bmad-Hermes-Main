@@ -23,6 +23,7 @@ the missing signal, so strong performance in one signal is still reflected.
 
 from __future__ import annotations
 
+import sys
 from typing import Any
 
 from app.retrieval.interface import (
@@ -92,8 +93,8 @@ class HybridRetriever:
         # individual retrievers' own top_n limits are bypassed here so that
         # a passage ranked below top_n in one signal but highly in the other
         # is not silently excluded before scoring.
-        semantic_results = self._semantic.search(query)
-        keyword_results = self._keyword.search(query)
+        semantic_results = self._semantic.search(query, top_n=sys.maxsize)
+        keyword_results = self._keyword.search(query, top_n=sys.maxsize)
 
         # Build score lookup dicts: passage_id -> score for each signal
         semantic_scores: dict[str, float] = {

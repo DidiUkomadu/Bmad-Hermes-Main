@@ -8,11 +8,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 
-class DocumentFormat(str, Enum):
+class DocumentFormat(StrEnum):
     """Supported document formats for MVP."""
 
     PDF = "pdf"

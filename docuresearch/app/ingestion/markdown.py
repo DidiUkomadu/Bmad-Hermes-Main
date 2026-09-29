@@ -88,7 +88,7 @@ def _ast_to_units(ast: list[dict[str, Any]]) -> list[dict[str, Any]]:
             level = node.get("attrs", {}).get("level", 1)
             heading_text = _extract_text_from_node(node).strip()
             # Update heading stack
-            heading_stack = [(l, h) for l, h in heading_stack if l < level]
+            heading_stack = [(lvl, h) for lvl, h in heading_stack if lvl < level]
             heading_stack.append((level, heading_text))
             section_loc = _current_section(heading_stack)
 
@@ -185,6 +185,8 @@ def _extract_text_from_node(node: dict[str, Any]) -> str:
                 ctype = child.get("type", "")
                 if ctype in ("text", "block_text", "inline_text"):
                     parts.append(child.get("raw", child.get("text", "")))
+                elif ctype in ("softbreak", "linebreak"):
+                    parts.append("\n")
                 elif "children" in child:
                     walk(child["children"])
 
@@ -223,6 +225,8 @@ def _extract_text_from_node(node: dict[str, Any]) -> str:
                 ctype = child.get("type", "")
                 if ctype in ("text", "block_text", "inline_text"):
                     parts.append(child.get("raw", child.get("text", "")))
+                elif ctype in ("softbreak", "linebreak"):
+                    parts.append("\n")
                 elif "children" in child:
                     walk(child["children"])
 

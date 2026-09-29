@@ -124,7 +124,7 @@ class TestParagraphBoundaryPreference:
         passages = chunk_passages(pdf_raw, config)
         locations = [p.location for p in passages]
         # PDF should have page-based locations
-        page_locs = [l for l in locations if l.startswith("page:")]
+        page_locs = [loc for loc in locations if loc.startswith("page:")]
         assert len(page_locs) > 0, "PDF should have page-based locations"
 
     def test_txt_chunks_by_paragraph(self, txt_raw):
@@ -132,7 +132,7 @@ class TestParagraphBoundaryPreference:
         config = ChunkingConfig(target_length=450, overlap=100)
         passages = chunk_passages(txt_raw, config)
         locations = [p.location for p in passages]
-        para_locs = [l for l in locations if l.startswith("paragraph:")]
+        para_locs = [loc for loc in locations if loc.startswith("paragraph:")]
         assert len(para_locs) > 0, "TXT should have paragraph-based locations"
 
     def test_pdf_preserves_page_boundaries(self, pdf_raw):
@@ -141,9 +141,9 @@ class TestParagraphBoundaryPreference:
         passages = chunk_passages(pdf_raw, config)
         locations = [p.location for p in passages]
         # At minimum, we should see page:1, page:2, page:3
-        assert any("page:1" in l for l in locations), "Missing page:1 reference"
-        assert any("page:2" in l for l in locations), "Missing page:2 reference"
-        assert any("page:3" in l for l in locations), "Missing page:3 reference"
+        assert any("page:1" in loc for loc in locations), "Missing page:1 reference"
+        assert any("page:2" in loc for loc in locations), "Missing page:2 reference"
+        assert any("page:3" in loc for loc in locations), "Missing page:3 reference"
 
 
 # ---------------------------------------------------------------------------
@@ -160,7 +160,7 @@ class TestMarkdownHeadingSectionPreference:
         locations = [p.location for p in passages]
 
         # Should see section paths (containing /)
-        section_locs = [l for l in locations if "/" in l or l.startswith("§")]
+        section_locs = [loc for loc in locations if "/" in loc or loc.startswith("§")]
         assert len(section_locs) > 0, (
             f"Markdown should have section-based locations, got: {locations[:5]}"
         )

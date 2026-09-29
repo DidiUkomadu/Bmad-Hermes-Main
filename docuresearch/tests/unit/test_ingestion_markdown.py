@@ -292,3 +292,14 @@ class TestMarkdownEdgeCases:
         content = b"# Unicode \xc3\xa9\xc3\xa8\xc3\xaa\n\nParagraph with \xe2\x80\x9cquotes\xe2\x80\x9d."
         result = parse_markdown(content, "unicode.md")
         assert len(result.full_text) > 0
+
+
+def test_line_breaks_and_heading_boundaries_do_not_merge_words():
+    """Soft line breaks and heading/body joins keep a separator between words."""
+    from app.chunking.strategy import chunk_passages
+
+    content = b"# Title\n\n## Revision History\n\nVersion 1.0: Initial.\nVersion 2.0: Rotation.\n"
+    passages = chunk_passages(parse_markdown(content, "rev.md"))
+    text = " ".join(p.text for p in passages)
+    assert "Initial.\nVersion 2.0" in text
+    assert "HistoryVersion" not in text

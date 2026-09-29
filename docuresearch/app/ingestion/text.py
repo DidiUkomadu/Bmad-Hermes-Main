@@ -103,7 +103,7 @@ def _split_paragraphs(text: str) -> list[str]:
     # Fallback: if no blank-line splits found, split on single newlines
     # but only if the text has meaningful line breaks
     if not result and text.strip():
-        lines = [l.strip() for l in text.splitlines() if l.strip()]
+        lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
         if lines:
             result = ["\n".join(lines)]
 

@@ -6,7 +6,12 @@
       "filename": "sample_spec.pdf",
       "format": "pdf",
       "name": "Alpha Protocol Specification",
-      "tags": ["technical-specification", "well-sectioned", "consistent", "page-boundary-test"],
+      "tags": [
+        "technical-specification",
+        "well-sectioned",
+        "consistent",
+        "page-boundary-test"
+      ],
       "page_count": 3,
       "description": "A technical specification for the Alpha Protocol, a secure data transmission protocol. Covers security requirements, authentication, performance, limitations, and revision history."
     },
@@ -15,7 +20,12 @@
       "filename": "sample_spec.md",
       "format": "markdown",
       "name": "Alpha Protocol Specification (Markdown)",
-      "tags": ["technical-specification", "well-sectioned", "heading-hierarchy-test", "consistent"],
+      "tags": [
+        "technical-specification",
+        "well-sectioned",
+        "heading-hierarchy-test",
+        "consistent"
+      ],
       "page_count": null,
       "section_count": 6,
       "description": "Same content as sample_spec.pdf but in Markdown format with clear heading hierarchy (H1 + H2 sections)."
@@ -25,9 +35,26 @@
       "filename": "sample_document.txt",
       "format": "txt",
       "name": "Omega Framework Documentation",
-      "tags": ["documentation", "flat-structure", "paragraph-test", "consistent"],
+      "tags": [
+        "documentation",
+        "flat-structure",
+        "paragraph-test",
+        "consistent"
+      ],
       "page_count": null,
       "description": "Plain text documentation for the Omega Framework, a distributed systems library. Flat structure with paragraph-based organization."
+    },
+    {
+      "id": "omega-release-notes",
+      "filename": "omega_release_notes.txt",
+      "format": "txt",
+      "name": "Omega Framework Release Notes",
+      "tags": [
+        "release-notes",
+        "conflicts-with-sample-document"
+      ],
+      "page_count": null,
+      "description": "Short release notes for the Omega Framework. Deliberately gives a first-release date (March 2018) that conflicts with sample_document.txt (2020); used by q-022."
     }
   ]
 }

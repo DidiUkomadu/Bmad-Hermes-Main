@@ -8,14 +8,22 @@
       "gold_answer": "All data transmissions using the Alpha Protocol must be encrypted with AES-256.",
       "gold_passages": [
         {
-          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
           "document_id": "sample-spec-pdf-d58d38e8",
           "document_name": "sample_spec.pdf",
-          "location": "page:2",
-          "claim": "The Alpha Protocol requires AES-256 encryption for all data transmissions."
+          "location": "page:1",
+          "claim": "The Alpha Protocol requires AES-256 encryption for all data transmissions.",
+          "equivalent_passage_ids": [
+            "sample-spec-md-b0f9ddb6:Sample Technical Document / Security Requirements:chunk:1"
+          ]
         }
       ],
-      "tags": ["security", "single-source", "pdf", "page-citation"]
+      "tags": [
+        "security",
+        "single-source",
+        "pdf",
+        "page-citation"
+      ]
     },
     {
       "id": "q-002",
@@ -24,14 +32,22 @@
       "gold_answer": "The encryption key must be rotated every 90 days.",
       "gold_passages": [
         {
-          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
           "document_id": "sample-spec-pdf-d58d38e8",
           "document_name": "sample_spec.pdf",
-          "location": "page:2",
-          "claim": "Key rotation must occur every 90 days."
+          "location": "page:1",
+          "claim": "Key rotation must occur every 90 days.",
+          "equivalent_passage_ids": [
+            "sample-spec-md-b0f9ddb6:Sample Technical Document / Security Requirements:chunk:1"
+          ]
         }
       ],
-      "tags": ["security", "single-source", "pdf", "page-citation"]
+      "tags": [
+        "security",
+        "single-source",
+        "pdf",
+        "page-citation"
+      ]
     },
     {
       "id": "q-003",
@@ -44,17 +60,28 @@
           "document_id": "sample-spec-pdf-d58d38e8",
           "document_name": "sample_spec.pdf",
           "location": "page:2",
-          "claim": "Authentication step one: client presents a signed token from the identity provider."
+          "claim": "Authentication step one: client presents a signed token from the identity provider.",
+          "equivalent_passage_ids": [
+            "sample-spec-md-b0f9ddb6:Sample Technical Document / Authentication:chunk:2"
+          ]
         },
         {
           "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
           "document_id": "sample-spec-pdf-d58d38e8",
           "document_name": "sample_spec.pdf",
           "location": "page:2",
-          "claim": "Authentication step two: server validates the token against the key registry."
+          "claim": "Authentication step two: server validates the token against the key registry.",
+          "equivalent_passage_ids": [
+            "sample-spec-md-b0f9ddb6:Sample Technical Document / Authentication:chunk:2"
+          ]
         }
       ],
-      "tags": ["authentication", "multi-passage", "pdf", "page-citation"]
+      "tags": [
+        "authentication",
+        "multi-passage",
+        "pdf",
+        "page-citation"
+      ]
     },
     {
       "id": "q-004",
@@ -67,10 +94,18 @@
           "document_id": "sample-spec-pdf-d58d38e8",
           "document_name": "sample_spec.pdf",
           "location": "page:2",
-          "claim": "Throughput is approximately 10,000 transactions per second on standard hardware."
+          "claim": "Throughput is approximately 10,000 transactions per second on standard hardware.",
+          "equivalent_passage_ids": [
+            "sample-spec-md-b0f9ddb6:Sample Technical Document / Performance Characteristics:chunk:3"
+          ]
         }
       ],
-      "tags": ["performance", "single-source", "pdf", "page-citation"]
+      "tags": [
+        "performance",
+        "single-source",
+        "pdf",
+        "page-citation"
+      ]
     },
     {
       "id": "q-005",
@@ -83,10 +118,18 @@
           "document_id": "sample-spec-pdf-d58d38e8",
           "document_name": "sample_spec.pdf",
           "location": "page:2",
-          "claim": "Latency under load is typically under 50 milliseconds for authenticated requests."
+          "claim": "Latency under load is typically under 50 milliseconds for authenticated requests.",
+          "equivalent_passage_ids": [
+            "sample-spec-md-b0f9ddb6:Sample Technical Document / Performance Characteristics:chunk:3"
+          ]
         }
       ],
-      "tags": ["performance", "single-source", "pdf", "page-citation"]
+      "tags": [
+        "performance",
+        "single-source",
+        "pdf",
+        "page-citation"
+      ]
     },
     {
       "id": "q-006",
@@ -99,17 +142,28 @@
           "document_id": "sample-spec-pdf-d58d38e8",
           "document_name": "sample_spec.pdf",
           "location": "page:3",
-          "claim": "The protocol does not support multicast transmission."
+          "claim": "The protocol does not support multicast transmission.",
+          "equivalent_passage_ids": [
+            "sample-spec-md-b0f9ddb6:Sample Technical Document / Limitations:chunk:4"
+          ]
         },
         {
           "passage_id": "sample-spec-pdf-d58d38e8:page:3:chunk:2",
           "document_id": "sample-spec-pdf-d58d38e8",
           "document_name": "sample_spec.pdf",
           "location": "page:3",
-          "claim": "It cannot be used over connections without a reliable transport layer."
+          "claim": "It cannot be used over connections without a reliable transport layer.",
+          "equivalent_passage_ids": [
+            "sample-spec-md-b0f9ddb6:Sample Technical Document / Limitations:chunk:4"
+          ]
         }
       ],
-      "tags": ["limitations", "multi-passage", "pdf", "page-citation"]
+      "tags": [
+        "limitations",
+        "multi-passage",
+        "pdf",
+        "page-citation"
+      ]
     },
     {
       "id": "q-007",
@@ -122,10 +176,18 @@
           "document_id": "sample-spec-pdf-d58d38e8",
           "document_name": "sample_spec.pdf",
           "location": "page:3",
-          "claim": "Version 4.0 - 2025-02-10: Current version."
+          "claim": "Version 4.0 - 2025-02-10: Current version.",
+          "equivalent_passage_ids": [
+            "sample-spec-md-b0f9ddb6:Sample Technical Document / Revision History:chunk:5"
+          ]
         }
       ],
-      "tags": ["revision-history", "single-source", "pdf", "page-citation"]
+      "tags": [
+        "revision-history",
+        "single-source",
+        "pdf",
+        "page-citation"
+      ]
     },
     {
       "id": "q-008",
@@ -138,10 +200,18 @@
           "document_id": "sample-spec-pdf-d58d38e8",
           "document_name": "sample_spec.pdf",
           "location": "page:1",
-          "claim": "The Alpha Protocol is for secure data transmission, first published in 2019."
+          "claim": "The Alpha Protocol is for secure data transmission, first published in 2019.",
+          "equivalent_passage_ids": [
+            "sample-spec-md-b0f9ddb6:Sample Technical Document:chunk:0"
+          ]
         }
       ],
-      "tags": ["introduction", "single-source", "pdf", "page-citation"]
+      "tags": [
+        "introduction",
+        "single-source",
+        "pdf",
+        "page-citation"
+      ]
     },
     {
       "id": "q-009",
@@ -154,10 +224,18 @@
           "document_id": "sample-spec-pdf-d58d38e8",
           "document_name": "sample_spec.pdf",
           "location": "page:3",
-          "claim": "The protocol does not support multicast transmission."
+          "claim": "The protocol does not support multicast transmission.",
+          "equivalent_passage_ids": [
+            "sample-spec-md-b0f9ddb6:Sample Technical Document / Limitations:chunk:4"
+          ]
         }
       ],
-      "tags": ["limitations", "single-source", "pdf", "page-citation"]
+      "tags": [
+        "limitations",
+        "single-source",
+        "pdf",
+        "page-citation"
+      ]
     },
     {
       "id": "q-010",
@@ -173,7 +251,12 @@
           "claim": "The Omega Framework provides bindings for Python, Rust, and Go."
         }
       ],
-      "tags": ["omega-framework", "single-source", "txt", "paragraph-citation"]
+      "tags": [
+        "omega-framework",
+        "single-source",
+        "txt",
+        "paragraph-citation"
+      ]
     },
     {
       "id": "q-011",
@@ -189,7 +272,12 @@
           "claim": "Memory management is automatic using a tracing garbage collector in a background thread."
         }
       ],
-      "tags": ["omega-framework", "single-source", "txt", "paragraph-citation"]
+      "tags": [
+        "omega-framework",
+        "single-source",
+        "txt",
+        "paragraph-citation"
+      ]
     },
     {
       "id": "q-012",
@@ -205,7 +293,12 @@
           "claim": "The framework supports request-reply (synchronous, blocking) and publish-subscribe (asynchronous, non-blocking) patterns."
         }
       ],
-      "tags": ["omega-framework", "single-source", "txt", "paragraph-citation"]
+      "tags": [
+        "omega-framework",
+        "single-source",
+        "txt",
+        "paragraph-citation"
+      ]
     },
     {
       "id": "q-013",
@@ -221,7 +314,12 @@
           "claim": "Up to 50,000 messages per second on a single node."
         }
       ],
-      "tags": ["omega-framework", "single-source", "txt", "paragraph-citation"]
+      "tags": [
+        "omega-framework",
+        "single-source",
+        "txt",
+        "paragraph-citation"
+      ]
     },
     {
       "id": "q-014",
@@ -237,7 +335,12 @@
           "claim": "Supports clustering across up to 100 nodes."
         }
       ],
-      "tags": ["omega-framework", "single-source", "txt", "paragraph-citation"]
+      "tags": [
+        "omega-framework",
+        "single-source",
+        "txt",
+        "paragraph-citation"
+      ]
     },
     {
       "id": "q-015",
@@ -253,7 +356,12 @@
           "claim": "No built-in discovery mechanism; services must be registered manually or through an external registry."
         }
       ],
-      "tags": ["omega-framework", "single-source", "txt", "paragraph-citation"]
+      "tags": [
+        "omega-framework",
+        "single-source",
+        "txt",
+        "paragraph-citation"
+      ]
     },
     {
       "id": "q-016",
@@ -269,7 +377,12 @@
           "claim": "The core API consists of three functions: spawn, send, and receive."
         }
       ],
-      "tags": ["omega-framework", "single-source", "txt", "paragraph-citation"]
+      "tags": [
+        "omega-framework",
+        "single-source",
+        "txt",
+        "paragraph-citation"
+      ]
     },
     {
       "id": "q-017",
@@ -282,10 +395,18 @@
           "document_id": "sample-spec-pdf-d58d38e8",
           "document_name": "sample_spec.pdf",
           "location": "page:1",
-          "claim": "First published in 2019."
+          "claim": "First published in 2019.",
+          "equivalent_passage_ids": [
+            "sample-spec-md-b0f9ddb6:Sample Technical Document:chunk:0"
+          ]
         }
       ],
-      "tags": ["revision-history", "single-source", "pdf", "page-citation"]
+      "tags": [
+        "revision-history",
+        "single-source",
+        "pdf",
+        "page-citation"
+      ]
     },
     {
       "id": "q-018",
@@ -298,7 +419,10 @@
           "document_id": "sample-spec-pdf-d58d38e8",
           "document_name": "sample_spec.pdf",
           "location": "page:1",
-          "claim": "The Alpha Protocol is for secure data transmission."
+          "claim": "The Alpha Protocol is for secure data transmission.",
+          "equivalent_passage_ids": [
+            "sample-spec-md-b0f9ddb6:Sample Technical Document:chunk:0"
+          ]
         },
         {
           "passage_id": "sample-document-txt-27c030ba:paragraph:2:chunk:1",
@@ -308,7 +432,11 @@
           "claim": "The Omega Framework is a library for building distributed systems."
         }
       ],
-      "tags": ["cross-document", "partial-evidence", "comparison"]
+      "tags": [
+        "cross-document",
+        "partial-evidence",
+        "comparison"
+      ]
     },
     {
       "id": "q-019",
@@ -323,7 +451,11 @@
         "location": "page:2",
         "claim": "Key rotation requirements: every 90 days, generate new key pair, distribute public key."
       },
-      "tags": ["security", "insufficient-evidence", "abstention-test"]
+      "tags": [
+        "security",
+        "insufficient-evidence",
+        "abstention-test"
+      ]
     },
     {
       "id": "q-020",
@@ -338,20 +470,27 @@
         "location": "page:2",
         "claim": "Throughput of ~10,000 transactions per second; latency under 50ms."
       },
-      "tags": ["performance", "insufficient-evidence", "abstention-test"]
+      "tags": [
+        "performance",
+        "insufficient-evidence",
+        "abstention-test"
+      ]
     },
     {
       "id": "q-021",
       "text": "Which protocol handles automatic memory management: the Alpha Protocol or the Omega Framework?",
-      "type": "conflicting_evidence",
-      "gold_answer": "The documents disagree on which system handles automatic memory management, but only because the question mischaracterizes both systems. The Alpha Protocol is a secure data transmission protocol and does not handle memory management at all -- it has no memory management features described in the documents. The Omega Framework handles automatic memory management via a tracing garbage collector. The apparent conflict arises from the question's framing: the Alpha Protocol is not a memory management system, so there is no actual disagreement between the sources -- only a question that incorrectly assumes one of them should handle memory management. The correct answer is that only the Omega Framework handles automatic memory management.",
+      "type": "multi_passage",
+      "gold_answer": "Only the Omega Framework handles automatic memory management, using a tracing garbage collector in a background thread. The Alpha Protocol is a secure data transmission protocol and the documents describe no memory management for it. The question's premise that either could be the answer does not reflect a disagreement between the sources.",
       "gold_passages": [
         {
           "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
           "document_id": "sample-spec-pdf-d58d38e8",
           "document_name": "sample_spec.pdf",
           "location": "page:1",
-          "claim": "Alpha Protocol is for secure data transmission -- no memory management described."
+          "claim": "Alpha Protocol is for secure data transmission -- no memory management described.",
+          "equivalent_passage_ids": [
+            "sample-spec-md-b0f9ddb6:Sample Technical Document:chunk:0"
+          ]
         },
         {
           "passage_id": "sample-document-txt-27c030ba:paragraph:5:chunk:4",
@@ -361,17 +500,49 @@
           "claim": "Omega Framework uses a tracing garbage collector for automatic memory management."
         }
       ],
-      "conflicting_sources": [
+      "tags": [
+        "cross-document",
+        "false-premise"
+      ]
+    },
+    {
+      "id": "q-022",
+      "text": "When was the Omega Framework first released?",
+      "type": "conflicting_evidence",
+      "gold_answer": "The documents disagree. The Omega Framework documentation says it was first released in 2020, while the Omega Framework release notes say version 1.0 was first released to the public in March 2018.",
+      "gold_passages": [
         {
-          "source": "Alpha Protocol Specification",
-          "claim": "No memory management functionality described (it is a transmission protocol)."
+          "passage_id": "sample-document-txt-27c030ba:paragraph:2:chunk:1",
+          "document_id": "sample-document-txt-27c030ba",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:2",
+          "claim": "First released in 2020."
         },
         {
-          "source": "Omega Framework Documentation",
-          "claim": "Automatic memory management via tracing garbage collector."
+          "passage_id": "omega-release-notes-txt-a7ae4a34:paragraph:3:chunk:1",
+          "document_id": "omega-release-notes-txt-a7ae4a34",
+          "document_name": "omega_release_notes.txt",
+          "location": "paragraph:3",
+          "claim": "Version 1.0 first released to the public in March 2018."
         }
       ],
-      "tags": ["cross-document", "conflicting-evidence", "conflict-resolution-test"]
+      "conflicting_sources": [
+        {
+          "source": "Omega Framework Documentation",
+          "document_name": "sample_document.txt",
+          "claim": "First released in 2020."
+        },
+        {
+          "source": "Omega Framework Release Notes",
+          "document_name": "omega_release_notes.txt",
+          "claim": "First released in March 2018."
+        }
+      ],
+      "tags": [
+        "cross-document",
+        "conflicting-evidence",
+        "release-date"
+      ]
     }
   ]
 }

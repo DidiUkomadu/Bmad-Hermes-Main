@@ -103,6 +103,9 @@ class StoreBackedSystem(SystemInterface):
     passages and resolve citations, even before the generation layer exists.
     """
 
+    # Placeholder answers are copied from retrieved passages.
+    answers_are_extractive = True
+
     def __init__(self, db_path: str):
         set_db_path(db_path)
         self._conn = None
@@ -289,6 +292,12 @@ def _cosine_similarity(vec_a: dict[str, int], vec_b: dict[str, int]) -> float:
     return dot / (mag_a * mag_b)
 
 
+def _rate(flags: list[bool]) -> str:
+    """Format a list of booleans as 'NN.N% (hits/total)'."""
+    hits = sum(1 for f in flags if f)
+    return f"{hits / len(flags):.1%} ({hits}/{len(flags)})"
+
+
 # ---------------------------------------------------------------------------
 # Runner
 # ---------------------------------------------------------------------------
@@ -399,7 +408,7 @@ class EvaluationRunner:
         self._compute_citation_correctness(result, question)
 
         # Compute answer faithfulness
-        self._compute_faithfulness(result, question, retrieved)
+        self._compute_faithfulness(result, question, retrieved, system)
 
         # Compute abstention accuracy
         self._compute_abstention(result, question)
@@ -420,25 +429,35 @@ class EvaluationRunner:
         gold_ids = {gp.passage_id for gp in question.gold_passages}
 
         if not gold_ids:
-            # Insufficient-evidence question: no gold passages
-            # Precision is undefined (no relevant passages to retrieve)
-            # Recall: if no passages retrieved, that's correct (recall = 1.0 vacuously)
+            # Insufficient-evidence question: no gold passages, so precision
+            # and recall are undefined. Ranked retrieval always returns its
+            # top-N candidates, so "retrieved nothing" is not a meaningful
+            # success signal; these questions are scored on abstention instead.
             result.retrieval_precision = None  # N/A
-            result.retrieval_recall = 1.0 if not retrieved else 0.0
+            result.retrieval_recall = None  # N/A
             return
 
         retrieved_ids = {r["passage_id"] for r in retrieved}
 
-        true_positives = retrieved_ids & gold_ids
+        # One entry per distinct gold passage; a gold passage is hit when it
+        # or any of its equivalents (same content in another document) is
+        # retrieved.
+        accepted_by_gold = {
+            gp.passage_id: gp.accepted_ids() for gp in question.gold_passages
+        }
+        all_accepted = set().union(*accepted_by_gold.values())
 
         # Precision: fraction of retrieved that are relevant
         if retrieved_ids:
-            result.retrieval_precision = len(true_positives) / len(retrieved_ids)
+            result.retrieval_precision = (
+                len(retrieved_ids & all_accepted) / len(retrieved_ids)
+            )
         else:
             result.retrieval_precision = 0.0
 
         # Recall: fraction of gold relevant that were retrieved
-        result.retrieval_recall = len(true_positives) / len(gold_ids)
+        hits = sum(1 for ids in accepted_by_gold.values() if ids & retrieved_ids)
+        result.retrieval_recall = hits / len(accepted_by_gold)
 
     def _compute_citation_correctness(
         self,
@@ -451,7 +470,7 @@ class EvaluationRunner:
             result.citation_correctness = None  # N/A
             return
 
-        gold_ids = {gp.passage_id for gp in question.gold_passages}
+        gold_ids = set().union(*(gp.accepted_ids() for gp in question.gold_passages))
 
         correct = 0
         for cit in citations:
@@ -468,18 +487,20 @@ class EvaluationRunner:
         result: EvaluationResult,
         question: EvaluationQuestion,
         retrieved: list[dict[str, Any]],
+        system: SystemInterface,
     ) -> None:
         """Determine if the answer is faithful to retrieved passages.
 
-        For the MVP placeholder system, answers are built directly from
-        retrieved passages, so they are always faithful. This method
-        exists as a placeholder for when the LLM-backed generation is
-        in place and we need to check for hallucinations.
+        Only systems that build answers verbatim from retrieved passages
+        (``answers_are_extractive = True``, e.g. the StoreBackedSystem
+        placeholder) are faithful by construction. For LLM-generated answers
+        faithfulness is not yet measured and is recorded as None rather than
+        assumed — the report then omits it instead of claiming 100%.
         """
-        # Placeholder: the stub system builds answers from retrieved passages,
-        # so faithfulness is guaranteed. In the real system, we would compare
-        # claims in the answer against the retrieved passages.
-        result.answer_faithful = True
+        if getattr(system, "answers_are_extractive", False):
+            result.answer_faithful = True
+        else:
+            result.answer_faithful = None
 
     def _compute_abstention(
         self,
@@ -512,11 +533,20 @@ class EvaluationRunner:
             result.conflict_handled = False
             return
 
-        # Check that both sources are mentioned in the answer
+        # Each conflicting source must be surfaced: either named in the answer
+        # text, or cited via a passage from that source's document (optional
+        # "document_name" field, the stored filename). The model only sees
+        # stored document names, so citation-based matching is the robust path.
+        cited_docs = {
+            c.get("document_name", "").lower() for c in result.system_citations
+        }
         all_mentioned = True
         for src in conf_sources:
             source_name = src.get("source", "").lower()
-            if source_name and source_name not in answer:
+            doc_name = src.get("document_name", "").lower()
+            named = bool(source_name) and source_name in answer
+            cited = bool(doc_name) and doc_name in cited_docs
+            if not (named or cited):
                 all_mentioned = False
                 break
 
@@ -564,27 +594,27 @@ class EvaluationRunner:
                         f"min={min(recalls):.3f}  max={max(recalls):.3f}")
 
         # Citation correctness
-        cit_correctness = [r.citation_correctness for r in results if r.citation_correctness is not None]
+        cit_correctness = [
+            r.citation_correctness for r in results if r.citation_correctness is not None
+        ]
         if cit_correctness:
-            lines.append(f"  Citation Correctness: mean={sum(cit_correctness)/len(cit_correctness):.3f}")
+            mean = sum(cit_correctness) / len(cit_correctness)
+            lines.append(f"  Citation Correctness: mean={mean:.3f}")
 
         # Faithfulness
-        faithful = [r for r in results if r.answer_faithful is not None]
+        faithful = [r.answer_faithful for r in results if r.answer_faithful is not None]
         if faithful:
-            rate = sum(1 for r in faithful if r.answer_faithful) / len(faithful)
-            lines.append(f"  Answer Faithfulness:  {rate:.1%} ({sum(1 for r in faithful if r.answer_faithful)}/{len(faithful)})")
+            lines.append(f"  Answer Faithfulness:  {_rate(faithful)}")
 
         # Abstention accuracy
-        abstentions = [r for r in results if r.abstention_correct is not None]
+        abstentions = [r.abstention_correct for r in results if r.abstention_correct is not None]
         if abstentions:
-            rate = sum(1 for r in abstentions if r.abstention_correct) / len(abstentions)
-            lines.append(f"  Abstention Accuracy:  {rate:.1%} ({sum(1 for r in abstentions if r.abstention_correct)}/{len(abstentions)})")
+            lines.append(f"  Abstention Accuracy:  {_rate(abstentions)}")
 
         # Conflict handling
-        conflicts = [r for r in results if r.conflict_handled is not None]
+        conflicts = [r.conflict_handled for r in results if r.conflict_handled is not None]
         if conflicts:
-            rate = sum(1 for r in conflicts if r.conflict_handled) / len(conflicts)
-            lines.append(f"  Conflict Handling:    {rate:.1%} ({sum(1 for r in conflicts if r.conflict_handled)}/{len(conflicts)})")
+            lines.append(f"  Conflict Handling:    {_rate(conflicts)}")
 
         # Latency
         latencies = [r.total_latency_s for r in results if r.total_latency_s > 0]

@@ -122,6 +122,42 @@ def finalize_generation(
     return answer
 
 
+UNGROUNDED_ANSWER_TEXT = (
+    "The documents do not contain enough verifiable support to answer this. "
+    "A draft answer was generated but none of its citations matched the "
+    "retrieved passages, so it was withheld."
+)
+
+
+def enforce_citation_grounding(answer: GeneratedAnswer) -> GeneratedAnswer:
+    """Withhold answers that claim evidence but carry no valid citations.
+
+    Must run AFTER ``resolve_citations`` so that ``answer.citations`` only
+    contains citations verified against the retrieved context.
+
+    Any non-INSUFFICIENT answer (sufficient, partial, or conflicting) asserts
+    that the documents support something; with zero valid citations that
+    assertion is unverifiable. The answer text is replaced (not just
+    re-labelled) so ungrounded content never reaches the user, and the
+    answer is converted to an INSUFFICIENT abstention.
+
+    INSUFFICIENT answers are returned unchanged — they may legitimately
+    have no citations.
+    """
+    if answer.evidence_quality == EvidenceQuality.INSUFFICIENT or answer.citations:
+        return answer
+    return replace(
+        answer,
+        answer_text=UNGROUNDED_ANSWER_TEXT,
+        evidence_quality=EvidenceQuality.INSUFFICIENT,
+        evidence_quality_narrative=(
+            f"The model reported '{answer.evidence_quality.value}' evidence but "
+            "provided no citations that resolve to retrieved passages."
+        ),
+        is_abstention=True,
+    )
+
+
 def is_abstention_answer(answer: GeneratedAnswer) -> bool:
     """Check whether a GeneratedAnswer is an abstention.
 

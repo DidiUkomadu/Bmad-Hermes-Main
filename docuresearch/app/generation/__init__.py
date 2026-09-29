@@ -6,8 +6,10 @@ Layers:
 - interface.py  — LLMInterface protocol, GeneratedAnswer, Citation, EvidenceQuality, LLMResponse
 - prompt.py     — build_prompt(context, config) → str (8-section prompt construction)
 - schema.py     — parse_llm_output(raw_text) → GeneratedAnswer | None (structured output parsing)
-- post_process.py — finalize_generation(answer, context) → GeneratedAnswer (abstention + evidence enforcement)
-- citation.py   — resolve_citations(answer, context) → GeneratedAnswer (citation validation + resolution)
+- post_process.py — finalize_generation(answer, context) → GeneratedAnswer
+                    (abstention + evidence enforcement)
+- citation.py   — resolve_citations(answer, context) → GeneratedAnswer
+                    (citation validation + resolution)
 
 Stories implemented:
 - 4.1: Model-agnostic LLM interface
@@ -40,6 +42,7 @@ from app.generation.interface import (
 )
 from app.generation.post_process import (
     classify_evidence_quality,
+    enforce_citation_grounding,
     finalize_generation,
     is_abstention_answer,
 )
@@ -54,6 +57,7 @@ __all__ = [
     "LLMResponse",
     # post_process.py
     "classify_evidence_quality",
+    "enforce_citation_grounding",
     "finalize_generation",
     "is_abstention_answer",
     # citation.py
