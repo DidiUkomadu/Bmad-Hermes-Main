@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+*.egg
+dist/
+build/
+.installed.cfg
+*.manifest
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Data / storage (git-ignored per implementation plan)
+data/storage/
+data/embeddings/
+data/uploads/
+
+# SQLite
+*.db
+*.sqlite
+*.sqlite3
+
+# Test artifacts
+.com/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# BMAD
+_bmad-output/
+_bmad/

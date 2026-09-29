@@ -1,0 +1,806 @@
+{
+  "label": "post-fix-verification",
+  "timestamp": "20260921_234451",
+  "run_timestamp": "2026-09-21T23:44:51",
+  "question_count": 21,
+  "results": [
+    {
+      "question_id": "q-001",
+      "system_answer": "Based on the retrieved passages:\n\n[sample_spec.pdf, unknown]: Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was f\n\n[sample_spec.md, unknown]: This document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first published in 2019 and has been revised three tim\n\n[sample_spec.md, unknown]: All data transmissions using the Alpha Protocol must be encrypted with AES-256. The encryption key must be rotated every 90 days. Each rotation requir",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first\npublished in 2019 and has been revised three ..."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Introduction:chunk:2",
+          "document_name": "sample_spec.md",
+          "location": "unknown",
+          "excerpt": "This document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first published in 2019 and has been revised three times since then."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Security Requirements:chunk:4",
+          "document_name": "sample_spec.md",
+          "location": "unknown",
+          "excerpt": "All data transmissions using the Alpha Protocol must be encrypted with AES-256. The encryption key must be rotated every 90 days. Each rotation requires generating a new key pair and securely distribu..."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The documents support this directly.",
+      "system_abstention": false,
+      "retrieval_precision": 0.058823529411764705,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.0,
+      "answer_faithful": true,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.0015809219985385425,
+      "generation_latency_s": 0.00031746500098961405,
+      "total_latency_s": 0.0018999879976036027,
+      "run_timestamp": "2026-09-21T23:44:51",
+      "notes": ""
+    },
+    {
+      "question_id": "q-002",
+      "system_answer": "Based on the retrieved passages:\n\n[sample_spec.pdf, unknown]: Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was f\n\n[sample_spec.md, unknown]: All data transmissions using the Alpha Protocol must be encrypted with AES-256. The encryption key must be rotated every 90 days. Each rotation requir\n\n[sample_spec.md, unknown]: Authentication proceeds in two steps. First, the client presents a signed token issued by the identity provider. Second, the server validates the toke",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first\npublished in 2019 and has been revised three ..."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Security Requirements:chunk:4",
+          "document_name": "sample_spec.md",
+          "location": "unknown",
+          "excerpt": "All data transmissions using the Alpha Protocol must be encrypted with AES-256. The encryption key must be rotated every 90 days. Each rotation requires generating a new key pair and securely distribu..."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Authentication:chunk:6",
+          "document_name": "sample_spec.md",
+          "location": "unknown",
+          "excerpt": "Authentication proceeds in two steps. First, the client presents a signed token issued by the identity provider. Second, the server validates the token against the current key registry. If the token i..."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The documents support this directly.",
+      "system_abstention": false,
+      "retrieval_precision": 0.05555555555555555,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.0,
+      "answer_faithful": true,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.000740785999369109,
+      "generation_latency_s": 0.00010365399793954566,
+      "total_latency_s": 0.0008456399991700891,
+      "run_timestamp": "2026-09-21T23:44:51",
+      "notes": ""
+    },
+    {
+      "question_id": "q-003",
+      "system_answer": "Based on the retrieved passages:\n\n[sample_spec.pdf, unknown]: Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the\n\n[sample_spec.md, unknown]: Authentication proceeds in two steps. First, the client presents a signed token issued by the identity provider. Second, the server validates the toke\n\n[sample_spec.pdf, unknown]: Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was f",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the server validates the token against the current ke..."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Authentication:chunk:6",
+          "document_name": "sample_spec.md",
+          "location": "unknown",
+          "excerpt": "Authentication proceeds in two steps. First, the client presents a signed token issued by the identity provider. Second, the server validates the token against the current key registry. If the token i..."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first\npublished in 2019 and has been revised three ..."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The documents support this directly.",
+      "system_abstention": false,
+      "retrieval_precision": 0.05263157894736842,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.3333333333333333,
+      "answer_faithful": true,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.0005666950019076467,
+      "generation_latency_s": 0.00014877700232318603,
+      "total_latency_s": 0.0007159729975683149,
+      "run_timestamp": "2026-09-21T23:44:51",
+      "notes": ""
+    },
+    {
+      "question_id": "q-004",
+      "system_answer": "Based on the retrieved passages:\n\n[sample_spec.pdf, unknown]: Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the\n\n[sample_spec.md, unknown]: Authentication proceeds in two steps. First, the client presents a signed token issued by the identity provider. Second, the server validates the toke\n\n[sample_document.txt, unknown]: One of the key design goals of the Omega Framework is simplicity. The core API consists of only three functions: spawn, send, and receive. Despite thi",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the server validates the token against the current ke..."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Authentication:chunk:6",
+          "document_name": "sample_spec.md",
+          "location": "unknown",
+          "excerpt": "Authentication proceeds in two steps. First, the client presents a signed token issued by the identity provider. Second, the server validates the token against the current key registry. If the token i..."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:3:chunk:2",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "One of the key design goals of the Omega Framework is simplicity. The core API consists of only three functions: spawn, send, and receive. Despite this simplicity, the framework can handle complex coo..."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The documents support this directly.",
+      "system_abstention": false,
+      "retrieval_precision": 0.058823529411764705,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.3333333333333333,
+      "answer_faithful": true,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.0006717489995935466,
+      "generation_latency_s": 0.00019520199930411763,
+      "total_latency_s": 0.0008674509990669321,
+      "run_timestamp": "2026-09-21T23:44:51",
+      "notes": ""
+    },
+    {
+      "question_id": "q-005",
+      "system_answer": "Based on the retrieved passages:\n\n[sample_spec.md, unknown]: The Alpha Protocol achieves a throughput of approximately 10,000 transactions per second on standard hardware. Latency under load is typically under 5\n\n[sample_spec.pdf, unknown]: Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the\n\n[sample_spec.pdf, unknown]: Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was f",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Performance Characteristics:chunk:8",
+          "document_name": "sample_spec.md",
+          "location": "unknown",
+          "excerpt": "The Alpha Protocol achieves a throughput of approximately 10,000 transactions per second on standard hardware. Latency under load is typically under 50 milliseconds for authenticated requests."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the server validates the token against the current ke..."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first\npublished in 2019 and has been revised three ..."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The documents support this directly.",
+      "system_abstention": false,
+      "retrieval_precision": 0.058823529411764705,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.3333333333333333,
+      "answer_faithful": true,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.0007930129977467004,
+      "generation_latency_s": 8.704500214662403e-05,
+      "total_latency_s": 0.0008808579987089615,
+      "run_timestamp": "2026-09-21T23:44:51",
+      "notes": ""
+    },
+    {
+      "question_id": "q-006",
+      "system_answer": "Based on the retrieved passages:\n\n[sample_spec.pdf, unknown]: Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was f\n\n[sample_spec.pdf, unknown]: Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the\n\n[sample_document.txt, unknown]: One of the key design goals of the Omega Framework is simplicity. The core API consists of only three functions: spawn, send, and receive. Despite thi",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first\npublished in 2019 and has been revised three ..."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the server validates the token against the current ke..."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:3:chunk:2",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "One of the key design goals of the Omega Framework is simplicity. The core API consists of only three functions: spawn, send, and receive. Despite this simplicity, the framework can handle complex coo..."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The documents support this directly.",
+      "system_abstention": false,
+      "retrieval_precision": 0.05555555555555555,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.0,
+      "answer_faithful": true,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.0005219710001256317,
+      "generation_latency_s": 7.79410001996439e-05,
+      "total_latency_s": 0.0006004120004945435,
+      "run_timestamp": "2026-09-21T23:44:51",
+      "notes": ""
+    },
+    {
+      "question_id": "q-007",
+      "system_answer": "Based on the retrieved passages:\n\n[sample_spec.md, unknown]: This document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first published in 2019 and has been revised three tim\n\n[sample_spec.pdf, unknown]: Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was f\n\n[sample_spec.pdf, unknown]: Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Introduction:chunk:2",
+          "document_name": "sample_spec.md",
+          "location": "unknown",
+          "excerpt": "This document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first published in 2019 and has been revised three times since then."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first\npublished in 2019 and has been revised three ..."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the server validates the token against the current ke..."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The documents support this directly.",
+      "system_abstention": false,
+      "retrieval_precision": 0.05555555555555555,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.0,
+      "answer_faithful": true,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.0004859529981331434,
+      "generation_latency_s": 6.673499956377782e-05,
+      "total_latency_s": 0.0005530880007427186,
+      "run_timestamp": "2026-09-21T23:44:51",
+      "notes": ""
+    },
+    {
+      "question_id": "q-008",
+      "system_answer": "Based on the retrieved passages:\n\n[sample_spec.pdf, unknown]: Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was f\n\n[sample_spec.md, unknown]: This document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first published in 2019 and has been revised three tim\n\n[sample_spec.pdf, unknown]: Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first\npublished in 2019 and has been revised three ..."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Introduction:chunk:2",
+          "document_name": "sample_spec.md",
+          "location": "unknown",
+          "excerpt": "This document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first published in 2019 and has been revised three times since then."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the server validates the token against the current ke..."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The documents support this directly.",
+      "system_abstention": false,
+      "retrieval_precision": 0.058823529411764705,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.3333333333333333,
+      "answer_faithful": true,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.0005042619995947462,
+      "generation_latency_s": 7.533999814768322e-05,
+      "total_latency_s": 0.0005800020007882267,
+      "run_timestamp": "2026-09-21T23:44:51",
+      "notes": ""
+    },
+    {
+      "question_id": "q-009",
+      "system_answer": "Based on the retrieved passages:\n\n[sample_spec.md, unknown]: The protocol does not support multicast transmission. It also cannot be used over connections that do not provide a reliable transport layer.\n\n[sample_spec.md, unknown]: This document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first published in 2019 and has been revised three tim\n\n[sample_spec.pdf, unknown]: Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was f",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Limitations:chunk:10",
+          "document_name": "sample_spec.md",
+          "location": "unknown",
+          "excerpt": "The protocol does not support multicast transmission. It also cannot be used over connections that do not provide a reliable transport layer."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Introduction:chunk:2",
+          "document_name": "sample_spec.md",
+          "location": "unknown",
+          "excerpt": "This document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first published in 2019 and has been revised three times since then."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first\npublished in 2019 and has been revised three ..."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The documents support this directly.",
+      "system_abstention": false,
+      "retrieval_precision": 0.058823529411764705,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.0,
+      "answer_faithful": true,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.00045043399950372986,
+      "generation_latency_s": 6.763500277884305e-05,
+      "total_latency_s": 0.0005184689980524126,
+      "run_timestamp": "2026-09-21T23:44:51",
+      "notes": ""
+    },
+    {
+      "question_id": "q-010",
+      "system_answer": "Based on the retrieved passages:\n\n[sample_document.txt, unknown]: The Omega Framework is written in C and provides bindings for Python, Rust, and Go. The Python bindings are the most widely used.\n\n[sample_document.txt, unknown]: The Omega Framework is a library for building distributed systems. It was designed at the Lambda Research Lab and first released in 2020.\n\n[sample_document.txt, unknown]: Performance benchmarks show that the Omega Framework can process up to 50,000 messages per second on a single node. For higher throughput, the framewo",
+      "system_citations": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:6:chunk:5",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "The Omega Framework is written in C and provides bindings for Python, Rust, and Go. The Python bindings are the most widely used."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:2:chunk:1",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "The Omega Framework is a library for building distributed systems. It was designed at the Lambda Research Lab and first released in 2020."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:7:chunk:6",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "Performance benchmarks show that the Omega Framework can process up to 50,000 messages per second on a single node. For higher throughput, the framework supports clustering across up to 100 nodes."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The documents support this directly.",
+      "system_abstention": false,
+      "retrieval_precision": 0.058823529411764705,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.3333333333333333,
+      "answer_faithful": true,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.00045053500070935115,
+      "generation_latency_s": 6.493399996543303e-05,
+      "total_latency_s": 0.0005160690016055014,
+      "run_timestamp": "2026-09-21T23:44:51",
+      "notes": ""
+    },
+    {
+      "question_id": "q-011",
+      "system_answer": "Based on the retrieved passages:\n\n[sample_document.txt, unknown]: Memory management in the Omega Framework is automatic. The framework uses a tracing garbage collector that runs in a background thread. This means dev\n\n[sample_document.txt, unknown]: The Omega Framework is written in C and provides bindings for Python, Rust, and Go. The Python bindings are the most widely used.\n\n[sample_document.txt, unknown]: The Omega Framework is a library for building distributed systems. It was designed at the Lambda Research Lab and first released in 2020.",
+      "system_citations": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:5:chunk:4",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "Memory management in the Omega Framework is automatic. The framework uses a tracing garbage collector that runs in a background thread. This means developers do not need to manually free memory."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:6:chunk:5",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "The Omega Framework is written in C and provides bindings for Python, Rust, and Go. The Python bindings are the most widely used."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:2:chunk:1",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "The Omega Framework is a library for building distributed systems. It was designed at the Lambda Research Lab and first released in 2020."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The documents support this directly.",
+      "system_abstention": false,
+      "retrieval_precision": 0.058823529411764705,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.3333333333333333,
+      "answer_faithful": true,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.0005008600019209553,
+      "generation_latency_s": 0.00012036299813189544,
+      "total_latency_s": 0.0006220239993126597,
+      "run_timestamp": "2026-09-21T23:44:51",
+      "notes": ""
+    },
+    {
+      "question_id": "q-012",
+      "system_answer": "Based on the retrieved passages:\n\n[sample_document.txt, unknown]: One of the key design goals of the Omega Framework is simplicity. The core API consists of only three functions: spawn, send, and receive. Despite thi\n\n[sample_document.txt, unknown]: The Omega Framework is written in C and provides bindings for Python, Rust, and Go. The Python bindings are the most widely used.\n\n[sample_document.txt, unknown]: Memory management in the Omega Framework is automatic. The framework uses a tracing garbage collector that runs in a background thread. This means dev",
+      "system_citations": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:3:chunk:2",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "One of the key design goals of the Omega Framework is simplicity. The core API consists of only three functions: spawn, send, and receive. Despite this simplicity, the framework can handle complex coo..."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:6:chunk:5",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "The Omega Framework is written in C and provides bindings for Python, Rust, and Go. The Python bindings are the most widely used."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:5:chunk:4",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "Memory management in the Omega Framework is automatic. The framework uses a tracing garbage collector that runs in a background thread. This means developers do not need to manually free memory."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The documents support this directly.",
+      "system_abstention": false,
+      "retrieval_precision": 0.058823529411764705,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.0,
+      "answer_faithful": true,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.0006072160031180829,
+      "generation_latency_s": 7.954100146889687e-05,
+      "total_latency_s": 0.0006873569982417393,
+      "run_timestamp": "2026-09-21T23:44:51",
+      "notes": ""
+    },
+    {
+      "question_id": "q-013",
+      "system_answer": "Based on the retrieved passages:\n\n[sample_document.txt, unknown]: One of the key design goals of the Omega Framework is simplicity. The core API consists of only three functions: spawn, send, and receive. Despite thi\n\n[sample_spec.pdf, unknown]: Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the\n\n[sample_document.txt, unknown]: Performance benchmarks show that the Omega Framework can process up to 50,000 messages per second on a single node. For higher throughput, the framewo",
+      "system_citations": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:3:chunk:2",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "One of the key design goals of the Omega Framework is simplicity. The core API consists of only three functions: spawn, send, and receive. Despite this simplicity, the framework can handle complex coo..."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the server validates the token against the current ke..."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:7:chunk:6",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "Performance benchmarks show that the Omega Framework can process up to 50,000 messages per second on a single node. For higher throughput, the framework supports clustering across up to 100 nodes."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The documents support this directly.",
+      "system_abstention": false,
+      "retrieval_precision": 0.058823529411764705,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.3333333333333333,
+      "answer_faithful": true,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.00046714299969607964,
+      "generation_latency_s": 6.72349997330457e-05,
+      "total_latency_s": 0.0005349780003598426,
+      "run_timestamp": "2026-09-21T23:44:51",
+      "notes": ""
+    },
+    {
+      "question_id": "q-014",
+      "system_answer": "Based on the retrieved passages:\n\n[sample_document.txt, unknown]: Performance benchmarks show that the Omega Framework can process up to 50,000 messages per second on a single node. For higher throughput, the framewo\n\n[sample_document.txt, unknown]: One of the key design goals of the Omega Framework is simplicity. The core API consists of only three functions: spawn, send, and receive. Despite thi\n\n[sample_document.txt, unknown]: The Omega Framework is written in C and provides bindings for Python, Rust, and Go. The Python bindings are the most widely used.",
+      "system_citations": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:7:chunk:6",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "Performance benchmarks show that the Omega Framework can process up to 50,000 messages per second on a single node. For higher throughput, the framework supports clustering across up to 100 nodes."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:3:chunk:2",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "One of the key design goals of the Omega Framework is simplicity. The core API consists of only three functions: spawn, send, and receive. Despite this simplicity, the framework can handle complex coo..."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:6:chunk:5",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "The Omega Framework is written in C and provides bindings for Python, Rust, and Go. The Python bindings are the most widely used."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The documents support this directly.",
+      "system_abstention": false,
+      "retrieval_precision": 0.058823529411764705,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.3333333333333333,
+      "answer_faithful": true,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.000452034997579176,
+      "generation_latency_s": 6.473399844253436e-05,
+      "total_latency_s": 0.0005171689990675077,
+      "run_timestamp": "2026-09-21T23:44:51",
+      "notes": ""
+    },
+    {
+      "question_id": "q-015",
+      "system_answer": "Based on the retrieved passages:\n\n[sample_document.txt, unknown]: The framework does not include a built-in discovery mechanism. Services must be registered manually or through an external service registry.\n\n[sample_document.txt, unknown]: Memory management in the Omega Framework is automatic. The framework uses a tracing garbage collector that runs in a background thread. This means dev\n\n[sample_document.txt, unknown]: The Omega Framework is written in C and provides bindings for Python, Rust, and Go. The Python bindings are the most widely used.",
+      "system_citations": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:8:chunk:7",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "The framework does not include a built-in discovery mechanism. Services must be registered manually or through an external service registry."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:5:chunk:4",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "Memory management in the Omega Framework is automatic. The framework uses a tracing garbage collector that runs in a background thread. This means developers do not need to manually free memory."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:6:chunk:5",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "The Omega Framework is written in C and provides bindings for Python, Rust, and Go. The Python bindings are the most widely used."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The documents support this directly.",
+      "system_abstention": false,
+      "retrieval_precision": 0.058823529411764705,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.3333333333333333,
+      "answer_faithful": true,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.0005237730001681484,
+      "generation_latency_s": 7.493900193367153e-05,
+      "total_latency_s": 0.0005991119978716597,
+      "run_timestamp": "2026-09-21T23:44:51",
+      "notes": ""
+    },
+    {
+      "question_id": "q-016",
+      "system_answer": "Based on the retrieved passages:\n\n[sample_document.txt, unknown]: One of the key design goals of the Omega Framework is simplicity. The core API consists of only three functions: spawn, send, and receive. Despite thi\n\n[sample_spec.md, unknown]: Authentication proceeds in two steps. First, the client presents a signed token issued by the identity provider. Second, the server validates the toke\n\n[sample_spec.pdf, unknown]: Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the",
+      "system_citations": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:3:chunk:2",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "One of the key design goals of the Omega Framework is simplicity. The core API consists of only three functions: spawn, send, and receive. Despite this simplicity, the framework can handle complex coo..."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Authentication:chunk:6",
+          "document_name": "sample_spec.md",
+          "location": "unknown",
+          "excerpt": "Authentication proceeds in two steps. First, the client presents a signed token issued by the identity provider. Second, the server validates the token against the current key registry. If the token i..."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the server validates the token against the current ke..."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The documents support this directly.",
+      "system_abstention": false,
+      "retrieval_precision": 0.058823529411764705,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.3333333333333333,
+      "answer_faithful": true,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.00045953899825690314,
+      "generation_latency_s": 6.793500142521225e-05,
+      "total_latency_s": 0.0005278749995341059,
+      "run_timestamp": "2026-09-21T23:44:51",
+      "notes": ""
+    },
+    {
+      "question_id": "q-017",
+      "system_answer": "Based on the retrieved passages:\n\n[sample_spec.md, unknown]: This document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first published in 2019 and has been revised three tim\n\n[sample_spec.pdf, unknown]: Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was f\n\n[sample_spec.pdf, unknown]: Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Introduction:chunk:2",
+          "document_name": "sample_spec.md",
+          "location": "unknown",
+          "excerpt": "This document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first published in 2019 and has been revised three times since then."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first\npublished in 2019 and has been revised three ..."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the server validates the token against the current ke..."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The documents support this directly.",
+      "system_abstention": false,
+      "retrieval_precision": 0.058823529411764705,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.3333333333333333,
+      "answer_faithful": true,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.0005111660029797349,
+      "generation_latency_s": 0.00012636599785764702,
+      "total_latency_s": 0.000638331999653019,
+      "run_timestamp": "2026-09-21T23:44:51",
+      "notes": ""
+    },
+    {
+      "question_id": "q-018",
+      "system_answer": "Based on the retrieved passages:\n\n[sample_spec.md, unknown]: Authentication proceeds in two steps. First, the client presents a signed token issued by the identity provider. Second, the server validates the toke\n\n[sample_spec.pdf, unknown]: Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the\n\n[sample_document.txt, unknown]: The Omega Framework is written in C and provides bindings for Python, Rust, and Go. The Python bindings are the most widely used.",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Authentication:chunk:6",
+          "document_name": "sample_spec.md",
+          "location": "unknown",
+          "excerpt": "Authentication proceeds in two steps. First, the client presents a signed token issued by the identity provider. Second, the server validates the token against the current key registry. If the token i..."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the server validates the token against the current ke..."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:6:chunk:5",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "The Omega Framework is written in C and provides bindings for Python, Rust, and Go. The Python bindings are the most widely used."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The documents support this directly.",
+      "system_abstention": false,
+      "retrieval_precision": 0.11764705882352941,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.0,
+      "answer_faithful": true,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.0008355350000783801,
+      "generation_latency_s": 9.905099796014838e-05,
+      "total_latency_s": 0.0009348860003228765,
+      "run_timestamp": "2026-09-21T23:44:51",
+      "notes": ""
+    },
+    {
+      "question_id": "q-019",
+      "system_answer": "Based on the retrieved passages:\n\n[sample_spec.pdf, unknown]: Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was f\n\n[sample_spec.pdf, unknown]: Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the\n\n[sample_spec.md, unknown]: Authentication proceeds in two steps. First, the client presents a signed token issued by the identity provider. Second, the server validates the toke",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first\npublished in 2019 and has been revised three ..."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the server validates the token against the current ke..."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Authentication:chunk:6",
+          "document_name": "sample_spec.md",
+          "location": "unknown",
+          "excerpt": "Authentication proceeds in two steps. First, the client presents a signed token issued by the identity provider. Second, the server validates the token against the current key registry. If the token i..."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The documents support this directly.",
+      "system_abstention": false,
+      "retrieval_precision": null,
+      "retrieval_recall": 0.0,
+      "citation_correctness": 0.0,
+      "answer_faithful": true,
+      "abstention_correct": false,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.0004985589985153638,
+      "generation_latency_s": 6.913600009283982e-05,
+      "total_latency_s": 0.0005681960028596222,
+      "run_timestamp": "2026-09-21T23:44:51",
+      "notes": ""
+    },
+    {
+      "question_id": "q-020",
+      "system_answer": "Based on the retrieved passages:\n\n[sample_spec.pdf, unknown]: Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was f\n\n[sample_spec.md, unknown]: This document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first published in 2019 and has been revised three tim\n\n[sample_spec.pdf, unknown]: Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first\npublished in 2019 and has been revised three ..."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Introduction:chunk:2",
+          "document_name": "sample_spec.md",
+          "location": "unknown",
+          "excerpt": "This document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first published in 2019 and has been revised three times since then."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the server validates the token against the current ke..."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The documents support this directly.",
+      "system_abstention": false,
+      "retrieval_precision": null,
+      "retrieval_recall": 0.0,
+      "citation_correctness": 0.0,
+      "answer_faithful": true,
+      "abstention_correct": false,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.0004587379989970941,
+      "generation_latency_s": 6.663399835815653e-05,
+      "total_latency_s": 0.0005257730008452199,
+      "run_timestamp": "2026-09-21T23:44:51",
+      "notes": ""
+    },
+    {
+      "question_id": "q-021",
+      "system_answer": "Based on the retrieved passages:\n\n[sample_spec.pdf, unknown]: Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was f\n\n[sample_document.txt, unknown]: Memory management in the Omega Framework is automatic. The framework uses a tracing garbage collector that runs in a background thread. This means dev\n\n[sample_spec.md, unknown]: This document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first published in 2019 and has been revised three tim",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_name": "sample_spec.pdf",
+          "location": "unknown",
+          "excerpt": "Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first\npublished in 2019 and has been revised three ..."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:5:chunk:4",
+          "document_name": "sample_document.txt",
+          "location": "unknown",
+          "excerpt": "Memory management in the Omega Framework is automatic. The framework uses a tracing garbage collector that runs in a background thread. This means developers do not need to manually free memory."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Introduction:chunk:2",
+          "document_name": "sample_spec.md",
+          "location": "unknown",
+          "excerpt": "This document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first published in 2019 and has been revised three times since then."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The documents support this directly.",
+      "system_abstention": false,
+      "retrieval_precision": 0.11764705882352941,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.6666666666666666,
+      "answer_faithful": true,
+      "abstention_correct": true,
+      "conflict_handled": false,
+      "retrieval_latency_s": 0.00045993999810889363,
+      "generation_latency_s": 6.503400072688237e-05,
+      "total_latency_s": 0.0005254739990050439,
+      "run_timestamp": "2026-09-21T23:44:51",
+      "notes": ""
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+This is a plain text document about the Omega Framework. It has no special formatting.
+
+The Omega Framework is a library for building distributed systems. It was designed at the Lambda Research Lab and first released in 2020.
+
+One of the key design goals of the Omega Framework is simplicity. The core API consists of only three functions: spawn, send, and receive. Despite this simplicity, the framework can handle complex coordination patterns.
+
+The framework supports two messaging patterns: request-reply and publish-subscribe. The request-reply pattern is synchronous and blocking. The publish-subscribe pattern is asynchronous and non-blocking.
+
+Memory management in the Omega Framework is automatic. The framework uses a tracing garbage collector that runs in a background thread. This means developers do not need to manually free memory.
+
+The Omega Framework is written in C and provides bindings for Python, Rust, and Go. The Python bindings are the most widely used.
+
+Performance benchmarks show that the Omega Framework can process up to 50,000 messages per second on a single node. For higher throughput, the framework supports clustering across up to 100 nodes.
+
+The framework does not include a built-in discovery mechanism. Services must be registered manually or through an external service registry.
+
+For more information, see the official documentation at https://omega.example.org/docs.

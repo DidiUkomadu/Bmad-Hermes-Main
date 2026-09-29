@@ -1,0 +1,33 @@
+{
+  "_comment": "Document metadata for the DocuResearch evaluation corpus. Tags describe document characteristics for dataset curation tracking.",
+  "documents": [
+    {
+      "id": "sample-spec-pdf",
+      "filename": "sample_spec.pdf",
+      "format": "pdf",
+      "name": "Alpha Protocol Specification",
+      "tags": ["technical-specification", "well-sectioned", "consistent", "page-boundary-test"],
+      "page_count": 3,
+      "description": "A technical specification for the Alpha Protocol, a secure data transmission protocol. Covers security requirements, authentication, performance, limitations, and revision history."
+    },
+    {
+      "id": "sample-spec-md",
+      "filename": "sample_spec.md",
+      "format": "markdown",
+      "name": "Alpha Protocol Specification (Markdown)",
+      "tags": ["technical-specification", "well-sectioned", "heading-hierarchy-test", "consistent"],
+      "page_count": null,
+      "section_count": 6,
+      "description": "Same content as sample_spec.pdf but in Markdown format with clear heading hierarchy (H1 + H2 sections)."
+    },
+    {
+      "id": "sample-document-txt",
+      "filename": "sample_document.txt",
+      "format": "txt",
+      "name": "Omega Framework Documentation",
+      "tags": ["documentation", "flat-structure", "paragraph-test", "consistent"],
+      "page_count": null,
+      "description": "Plain text documentation for the Omega Framework, a distributed systems library. Flat structure with paragraph-based organization."
+    }
+  ]
+}

@@ -1,0 +1,377 @@
+{
+  "_comment": "Evaluation questions for DocuResearch. Each question has a gold answer and passage references. Passage IDs and document IDs are populated from the SQLite content store after ingestion. IDs are deterministic (MD5 hash of filename) so they survive re-ingestion.",
+  "questions": [
+    {
+      "id": "q-001",
+      "text": "What encryption algorithm must be used for data transmissions in the Alpha Protocol?",
+      "type": "single_source",
+      "gold_answer": "All data transmissions using the Alpha Protocol must be encrypted with AES-256.",
+      "gold_passages": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_id": "sample-spec-pdf-d58d38e8",
+          "document_name": "sample_spec.pdf",
+          "location": "page:2",
+          "claim": "The Alpha Protocol requires AES-256 encryption for all data transmissions."
+        }
+      ],
+      "tags": ["security", "single-source", "pdf", "page-citation"]
+    },
+    {
+      "id": "q-002",
+      "text": "How often must the encryption key be rotated in the Alpha Protocol?",
+      "type": "single_source",
+      "gold_answer": "The encryption key must be rotated every 90 days.",
+      "gold_passages": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_id": "sample-spec-pdf-d58d38e8",
+          "document_name": "sample_spec.pdf",
+          "location": "page:2",
+          "claim": "Key rotation must occur every 90 days."
+        }
+      ],
+      "tags": ["security", "single-source", "pdf", "page-citation"]
+    },
+    {
+      "id": "q-003",
+      "text": "Describe the two-step authentication process in the Alpha Protocol.",
+      "type": "multi_passage",
+      "gold_answer": "Authentication in the Alpha Protocol proceeds in two steps. First, the client presents a signed token issued by the identity provider. Second, the server validates the token against the current key registry. If the token is valid and the key has not been revoked, access is granted.",
+      "gold_passages": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_id": "sample-spec-pdf-d58d38e8",
+          "document_name": "sample_spec.pdf",
+          "location": "page:2",
+          "claim": "Authentication step one: client presents a signed token from the identity provider."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_id": "sample-spec-pdf-d58d38e8",
+          "document_name": "sample_spec.pdf",
+          "location": "page:2",
+          "claim": "Authentication step two: server validates the token against the key registry."
+        }
+      ],
+      "tags": ["authentication", "multi-passage", "pdf", "page-citation"]
+    },
+    {
+      "id": "q-004",
+      "text": "What is the throughput of the Alpha Protocol?",
+      "type": "single_source",
+      "gold_answer": "The Alpha Protocol achieves a throughput of approximately 10,000 transactions per second on standard hardware.",
+      "gold_passages": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_id": "sample-spec-pdf-d58d38e8",
+          "document_name": "sample_spec.pdf",
+          "location": "page:2",
+          "claim": "Throughput is approximately 10,000 transactions per second on standard hardware."
+        }
+      ],
+      "tags": ["performance", "single-source", "pdf", "page-citation"]
+    },
+    {
+      "id": "q-005",
+      "text": "What latency can be expected under load for authenticated requests in the Alpha Protocol?",
+      "type": "single_source",
+      "gold_answer": "Latency under load is typically under 50 milliseconds for authenticated requests.",
+      "gold_passages": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_id": "sample-spec-pdf-d58d38e8",
+          "document_name": "sample_spec.pdf",
+          "location": "page:2",
+          "claim": "Latency under load is typically under 50 milliseconds for authenticated requests."
+        }
+      ],
+      "tags": ["performance", "single-source", "pdf", "page-citation"]
+    },
+    {
+      "id": "q-006",
+      "text": "What are the limitations of the Alpha Protocol?",
+      "type": "multi_passage",
+      "gold_answer": "The Alpha Protocol does not support multicast transmission. It also cannot be used over connections that do not provide a reliable transport layer.",
+      "gold_passages": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:3:chunk:2",
+          "document_id": "sample-spec-pdf-d58d38e8",
+          "document_name": "sample_spec.pdf",
+          "location": "page:3",
+          "claim": "The protocol does not support multicast transmission."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:3:chunk:2",
+          "document_id": "sample-spec-pdf-d58d38e8",
+          "document_name": "sample_spec.pdf",
+          "location": "page:3",
+          "claim": "It cannot be used over connections without a reliable transport layer."
+        }
+      ],
+      "tags": ["limitations", "multi-passage", "pdf", "page-citation"]
+    },
+    {
+      "id": "q-007",
+      "text": "What is the most recent version of the Alpha Protocol and when was it published?",
+      "type": "single_source",
+      "gold_answer": "The current version is Version 4.0, published on 2025-02-10.",
+      "gold_passages": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:3:chunk:2",
+          "document_id": "sample-spec-pdf-d58d38e8",
+          "document_name": "sample_spec.pdf",
+          "location": "page:3",
+          "claim": "Version 4.0 - 2025-02-10: Current version."
+        }
+      ],
+      "tags": ["revision-history", "single-source", "pdf", "page-citation"]
+    },
+    {
+      "id": "q-008",
+      "text": "What is the Alpha Protocol?",
+      "type": "single_source",
+      "gold_answer": "The Alpha Protocol is a protocol for secure data transmission, first published in 2019.",
+      "gold_passages": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_id": "sample-spec-pdf-d58d38e8",
+          "document_name": "sample_spec.pdf",
+          "location": "page:1",
+          "claim": "The Alpha Protocol is for secure data transmission, first published in 2019."
+        }
+      ],
+      "tags": ["introduction", "single-source", "pdf", "page-citation"]
+    },
+    {
+      "id": "q-009",
+      "text": "Does the Alpha Protocol support multicast transmission?",
+      "type": "single_source",
+      "gold_answer": "No, the Alpha Protocol does not support multicast transmission.",
+      "gold_passages": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:3:chunk:2",
+          "document_id": "sample-spec-pdf-d58d38e8",
+          "document_name": "sample_spec.pdf",
+          "location": "page:3",
+          "claim": "The protocol does not support multicast transmission."
+        }
+      ],
+      "tags": ["limitations", "single-source", "pdf", "page-citation"]
+    },
+    {
+      "id": "q-010",
+      "text": "What programming languages have bindings for the Omega Framework?",
+      "type": "single_source",
+      "gold_answer": "The Omega Framework provides bindings for Python, Rust, and Go. The Python bindings are the most widely used.",
+      "gold_passages": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:6:chunk:5",
+          "document_id": "sample-document-txt-27c030ba",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:6",
+          "claim": "The Omega Framework provides bindings for Python, Rust, and Go."
+        }
+      ],
+      "tags": ["omega-framework", "single-source", "txt", "paragraph-citation"]
+    },
+    {
+      "id": "q-011",
+      "text": "How does memory management work in the Omega Framework?",
+      "type": "single_source",
+      "gold_answer": "Memory management in the Omega Framework is automatic. The framework uses a tracing garbage collector that runs in a background thread, so developers do not need to manually free memory.",
+      "gold_passages": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:5:chunk:4",
+          "document_id": "sample-document-txt-27c030ba",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:5",
+          "claim": "Memory management is automatic using a tracing garbage collector in a background thread."
+        }
+      ],
+      "tags": ["omega-framework", "single-source", "txt", "paragraph-citation"]
+    },
+    {
+      "id": "q-012",
+      "text": "What messaging patterns does the Omega Framework support?",
+      "type": "single_source",
+      "gold_answer": "The Omega Framework supports two messaging patterns: request-reply and publish-subscribe. The request-reply pattern is synchronous and blocking. The publish-subscribe pattern is asynchronous and non-blocking.",
+      "gold_passages": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:4:chunk:3",
+          "document_id": "sample-document-txt-27c030ba",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:4",
+          "claim": "The framework supports request-reply (synchronous, blocking) and publish-subscribe (asynchronous, non-blocking) patterns."
+        }
+      ],
+      "tags": ["omega-framework", "single-source", "txt", "paragraph-citation"]
+    },
+    {
+      "id": "q-013",
+      "text": "What is the maximum throughput of the Omega Framework on a single node?",
+      "type": "single_source",
+      "gold_answer": "The Omega Framework can process up to 50,000 messages per second on a single node.",
+      "gold_passages": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:7:chunk:6",
+          "document_id": "sample-document-txt-27c030ba",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:7",
+          "claim": "Up to 50,000 messages per second on a single node."
+        }
+      ],
+      "tags": ["omega-framework", "single-source", "txt", "paragraph-citation"]
+    },
+    {
+      "id": "q-014",
+      "text": "How many nodes can the Omega Framework cluster across?",
+      "type": "single_source",
+      "gold_answer": "The Omega Framework supports clustering across up to 100 nodes.",
+      "gold_passages": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:7:chunk:6",
+          "document_id": "sample-document-txt-27c030ba",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:7",
+          "claim": "Supports clustering across up to 100 nodes."
+        }
+      ],
+      "tags": ["omega-framework", "single-source", "txt", "paragraph-citation"]
+    },
+    {
+      "id": "q-015",
+      "text": "Does the Omega Framework include a built-in service discovery mechanism?",
+      "type": "single_source",
+      "gold_answer": "No, the Omega Framework does not include a built-in discovery mechanism. Services must be registered manually or through an external service registry.",
+      "gold_passages": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:8:chunk:7",
+          "document_id": "sample-document-txt-27c030ba",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:8",
+          "claim": "No built-in discovery mechanism; services must be registered manually or through an external registry."
+        }
+      ],
+      "tags": ["omega-framework", "single-source", "txt", "paragraph-citation"]
+    },
+    {
+      "id": "q-016",
+      "text": "What is the core API of the Omega Framework?",
+      "type": "single_source",
+      "gold_answer": "The core API of the Omega Framework consists of three functions: spawn, send, and receive.",
+      "gold_passages": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:3:chunk:2",
+          "document_id": "sample-document-txt-27c030ba",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:3",
+          "claim": "The core API consists of three functions: spawn, send, and receive."
+        }
+      ],
+      "tags": ["omega-framework", "single-source", "txt", "paragraph-citation"]
+    },
+    {
+      "id": "q-017",
+      "text": "When was the Alpha Protocol first published?",
+      "type": "single_source",
+      "gold_answer": "The Alpha Protocol was first published in 2019.",
+      "gold_passages": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_id": "sample-spec-pdf-d58d38e8",
+          "document_name": "sample_spec.pdf",
+          "location": "page:1",
+          "claim": "First published in 2019."
+        }
+      ],
+      "tags": ["revision-history", "single-source", "pdf", "page-citation"]
+    },
+    {
+      "id": "q-018",
+      "text": "What is the difference between the Alpha Protocol and the Omega Framework?",
+      "type": "partial_evidence",
+      "gold_answer": "The Alpha Protocol is a secure data transmission protocol requiring AES-256 encryption, with key rotation every 90 days, two-step authentication, throughput of ~10,000 transactions/second, and latency under 50ms. It does not support multicast or unreliable transport. The Omega Framework is a distributed systems library with a three-function core API (spawn, send, receive), automatic garbage collection, request-reply and publish-subscribe messaging, up to 50,000 msg/s on a single node, clustering up to 100 nodes, written in C with Python/Rust/Go bindings. The documents do not describe any relationship or comparison between the two -- they are completely separate systems with no documented interoperability or comparative analysis.",
+      "gold_passages": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_id": "sample-spec-pdf-d58d38e8",
+          "document_name": "sample_spec.pdf",
+          "location": "page:1",
+          "claim": "The Alpha Protocol is for secure data transmission."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:2:chunk:1",
+          "document_id": "sample-document-txt-27c030ba",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:2",
+          "claim": "The Omega Framework is a library for building distributed systems."
+        }
+      ],
+      "tags": ["cross-document", "partial-evidence", "comparison"]
+    },
+    {
+      "id": "q-019",
+      "text": "What is the exact key rotation procedure for the Alpha Protocol?",
+      "type": "insufficient_evidence",
+      "gold_answer": "The documents state that the encryption key must be rotated every 90 days and that each rotation requires generating a new key pair and securely distributing the public key to all authorized recipients. However, the documents do not describe the specific procedure for generating the key pair, the mechanism for secure distribution, or how authorized recipients are identified. A complete answer to the exact procedure is not possible from these documents alone.",
+      "gold_passages": [],
+      "closest_passage": {
+        "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+        "document_id": "sample-spec-pdf-d58d38e8",
+        "document_name": "sample_spec.pdf",
+        "location": "page:2",
+        "claim": "Key rotation requirements: every 90 days, generate new key pair, distribute public key."
+      },
+      "tags": ["security", "insufficient-evidence", "abstention-test"]
+    },
+    {
+      "id": "q-020",
+      "text": "What is the Alpha Protocol's maximum supported message payload size?",
+      "type": "insufficient_evidence",
+      "gold_answer": "The documents do not contain any information about the Alpha Protocol's maximum supported message payload size. The closest relevant information is the throughput figure (10,000 transactions per second) and latency figure (under 50ms), but neither addresses payload size limits.",
+      "gold_passages": [],
+      "closest_passage": {
+        "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+        "document_id": "sample-spec-pdf-d58d38e8",
+        "document_name": "sample_spec.pdf",
+        "location": "page:2",
+        "claim": "Throughput of ~10,000 transactions per second; latency under 50ms."
+      },
+      "tags": ["performance", "insufficient-evidence", "abstention-test"]
+    },
+    {
+      "id": "q-021",
+      "text": "Which protocol handles automatic memory management: the Alpha Protocol or the Omega Framework?",
+      "type": "conflicting_evidence",
+      "gold_answer": "The documents disagree on which system handles automatic memory management, but only because the question mischaracterizes both systems. The Alpha Protocol is a secure data transmission protocol and does not handle memory management at all -- it has no memory management features described in the documents. The Omega Framework handles automatic memory management via a tracing garbage collector. The apparent conflict arises from the question's framing: the Alpha Protocol is not a memory management system, so there is no actual disagreement between the sources -- only a question that incorrectly assumes one of them should handle memory management. The correct answer is that only the Omega Framework handles automatic memory management.",
+      "gold_passages": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_id": "sample-spec-pdf-d58d38e8",
+          "document_name": "sample_spec.pdf",
+          "location": "page:1",
+          "claim": "Alpha Protocol is for secure data transmission -- no memory management described."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:5:chunk:4",
+          "document_id": "sample-document-txt-27c030ba",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:5",
+          "claim": "Omega Framework uses a tracing garbage collector for automatic memory management."
+        }
+      ],
+      "conflicting_sources": [
+        {
+          "source": "Alpha Protocol Specification",
+          "claim": "No memory management functionality described (it is a transmission protocol)."
+        },
+        {
+          "source": "Omega Framework Documentation",
+          "claim": "Automatic memory management via tracing garbage collector."
+        }
+      ],
+      "tags": ["cross-document", "conflicting-evidence", "conflict-resolution-test"]
+    }
+  ]
+}
