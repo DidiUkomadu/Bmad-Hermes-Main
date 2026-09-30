@@ -9,7 +9,9 @@
 ## Tech Stack
 - **Language:** Python
 - **Framework:** FastAPI
-- **LLM layer:** Model-agnostic architecture. Start with free Nous model through Hermes for the agent layer.
+- **LLM layer:** Model-agnostic architecture (any OpenAI-compatible endpoint, configured in `docuresearch/.env`).
+  - **App LLM (current):** OpenRouter free tier, `nvidia/nemotron-3-super-120b-a12b:free`. Switched from Nous on 2026-09-30 because Nous Portal API access requires payment.
+  - **Coding agent:** Hermes Agent (Nous) was used for Epics 0–4; later work continued without it.
 - **Linting/formatting:** Ruff
 
 ## Scope (MVP)

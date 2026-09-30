@@ -49,3 +49,6 @@ Thumbs.db
 # BMAD
 _bmad-output/
 _bmad/
+
+# Local configuration (copy of config.example.toml)
+config.toml

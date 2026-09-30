@@ -33,6 +33,54 @@ _SYSTEM_MESSAGE = (
 )
 
 
+_MAX_RETRY_DELAY_SECONDS = 30.0
+
+
+class ProviderError(httpx.HTTPError):
+    """An error reported in the response body rather than the HTTP status."""
+
+    def __init__(self, status: int, message: str) -> None:
+        super().__init__(f"provider error {status}: {message}")
+        self.status = status
+
+
+def _error_body(resp: httpx.Response) -> dict[str, Any] | None:
+    try:
+        body = resp.json()
+    except ValueError:
+        return None
+    if isinstance(body, dict) and isinstance(body.get("error"), dict) and "choices" not in body:
+        return body["error"]
+    return None
+
+
+def _effective_status(resp: httpx.Response) -> int:
+    """HTTP status, or the provider's embedded error code for a 200 error body."""
+    if resp.status_code != 200:
+        return resp.status_code
+    error = _error_body(resp)
+    if error is None:
+        return 200
+    try:
+        return int(error.get("code"))
+    except (TypeError, ValueError):
+        return 502  # unrecognised provider error: treat as a retryable upstream failure
+
+
+def _provider_message(resp: httpx.Response) -> str:
+    error = _error_body(resp) or {}
+    metadata = error.get("metadata")
+    raw = metadata.get("raw") if isinstance(metadata, dict) else None
+    return str(raw or error.get("message") or "unknown error")[:300]
+
+
+def _retry_after_seconds(resp: httpx.Response) -> float | None:
+    try:
+        return max(0.0, float(resp.headers["retry-after"]))
+    except (KeyError, ValueError):
+        return None
+
+
 class LLMConfigError(RuntimeError):
     """Raised when the LLM backend is not configured."""
 
@@ -48,6 +96,8 @@ class OpenAICompatibleLLM:
         temperature: Sampling temperature. Defaults to 0 for reproducible
             evaluation runs.
         client: Optional preconfigured ``httpx.Client`` (used by tests).
+        max_retries: Retries for 429 and 5xx responses.
+        backoff_seconds: First retry delay; doubles on each retry.
     """
 
     def __init__(
@@ -58,6 +108,8 @@ class OpenAICompatibleLLM:
         timeout_seconds: float = 120.0,
         temperature: float = 0.0,
         client: httpx.Client | None = None,
+        max_retries: int = 3,
+        backoff_seconds: float = 2.0,
     ) -> None:
         self._url = base_url.rstrip("/") + "/chat/completions"
         self._model = model
@@ -67,6 +119,36 @@ class OpenAICompatibleLLM:
             headers["Authorization"] = f"Bearer {api_key}"
         self._client = client or httpx.Client(timeout=timeout_seconds)
         self._headers = headers
+        self._max_retries = max_retries
+        self._backoff_seconds = backoff_seconds
+
+    def _post_with_retry(self, payload: dict[str, Any]) -> httpx.Response:
+        """POST, retrying rate limits (429) and server errors (5xx) with backoff.
+
+        Free tiers are often briefly rate-limited upstream; a few short retries
+        keep one busy moment from failing a request. Honors ``Retry-After``
+        (capped). Other errors are raised immediately.
+
+        Some gateways (e.g. OpenRouter) report provider errors inside a 200
+        response as ``{"error": {"code": ..., "message": ...}}``; those are
+        treated by their embedded code.
+        """
+        for attempt in range(self._max_retries + 1):
+            resp = self._client.post(self._url, json=payload, headers=self._headers)
+            status = _effective_status(resp)
+            retryable = status == 429 or status >= 500
+            if not retryable or attempt == self._max_retries:
+                resp.raise_for_status()
+                if status != resp.status_code:
+                    raise ProviderError(status, _provider_message(resp))
+                return resp
+            delay = _retry_after_seconds(resp) or self._backoff_seconds * 2**attempt
+            time.sleep(min(delay, _MAX_RETRY_DELAY_SECONDS))
+        raise AssertionError("unreachable")
+
+    def close(self) -> None:
+        """Release the underlying HTTP connection pool."""
+        self._client.close()
 
     @classmethod
     def from_env(cls) -> OpenAICompatibleLLM:
@@ -105,8 +187,7 @@ class OpenAICompatibleLLM:
 
         start = time.monotonic()
         try:
-            resp = self._client.post(self._url, json=payload, headers=self._headers)
-            resp.raise_for_status()
+            resp = self._post_with_retry(payload)
             raw_text = resp.json()["choices"][0]["message"]["content"] or ""
         except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError) as exc:
             return LLMResponse(

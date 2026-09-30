@@ -12,14 +12,16 @@ Usage (from the docuresearch/ directory, with DOCURESEARCH_LLM_* set):
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import logging
 import sys
 import tempfile
 from pathlib import Path
 from typing import Any
 
-from app.generation.openai_compat import LLMConfigError, OpenAICompatibleLLM
+from app.config import Settings
 from app.generation.prompt import RetrievedContext
+from app.main import _build_pipeline
 from app.pipeline import GenerationError, ResearchPipeline
 from app.store.schema import get_connection, get_passage, set_db_path
 from evaluation.runner import DATASET_DIR, EvaluationRunner, SystemInterface
@@ -105,26 +107,47 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--label", default="pipeline", help="Label for the results file")
     parser.add_argument("--no-save", action="store_true", help="Do not write a results file")
+    parser.add_argument(
+        "--questions",
+        help="Comma-separated question IDs to run (default: all), e.g. q-001,q-002",
+    )
     args = parser.parse_args(argv)
 
     logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(name)s: %(message)s")
 
-    try:
-        llm = OpenAICompatibleLLM.from_env()
-    except LLMConfigError as exc:
-        print(exc, file=sys.stderr)
+    settings = Settings.load()
+    if not settings.llm.configured:
+        print(
+            "LLM backend not configured: set DOCURESEARCH_LLM_BASE_URL and "
+            "DOCURESEARCH_LLM_MODEL (and DOCURESEARCH_LLM_API_KEY) in the environment "
+            "or docuresearch/.env. See .env.example.",
+            file=sys.stderr,
+        )
         return 2
+    print(f"Model: {settings.llm.model} at {settings.llm.base_url}")
 
     with tempfile.TemporaryDirectory() as tmp:
-        db_path = str(Path(tmp) / "eval.db")
-        pipeline = ResearchPipeline(db_path, llm)
+        db_path = Path(tmp) / "eval.db"
+        pipeline, llm = _build_pipeline(dataclasses.replace(settings, db_path=db_path))
+        db_path = str(db_path)
         for doc in sorted((DATASET_DIR / "documents").iterdir()):
             if doc.is_file():
                 info = pipeline.ingest(doc)
                 print(f"Ingested {info['document_name']}: {info['passage_count']} passages")
 
         runner = EvaluationRunner()
-        results = runner.run(system=PipelineSystem(pipeline, db_path))
+        questions = runner.load_questions()
+        if args.questions:
+            wanted = {q.strip() for q in args.questions.split(",") if q.strip()}
+            unknown = wanted - {q.id for q in questions}
+            if unknown:
+                print(f"Unknown question IDs: {', '.join(sorted(unknown))}", file=sys.stderr)
+                return 2
+            questions = [q for q in questions if q.id in wanted]
+        try:
+            results = runner.run(questions, system=PipelineSystem(pipeline, db_path))
+        finally:
+            llm.close()
 
     print(runner.report(results))
     failures = [r for r in results if r.system_answer.startswith(GENERATION_FAILED_PREFIX)]

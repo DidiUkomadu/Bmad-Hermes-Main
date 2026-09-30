@@ -137,7 +137,8 @@ def test_openai_compat_sends_request_and_parses_answer():
     assert resp.structured.citations[0].passage_id == "p1"
 
 
-def test_openai_compat_reports_http_errors():
+def test_openai_compat_reports_http_errors(monkeypatch):
+    monkeypatch.setattr("app.generation.openai_compat.time.sleep", lambda s: None)
     resp = _llm_with(lambda r: httpx.Response(500, text="boom")).generate("PROMPT")
     assert resp.structured is None
     assert "LLM request failed" in resp.parse_error
@@ -148,3 +149,64 @@ def test_openai_compat_from_env_requires_config(monkeypatch):
     monkeypatch.delenv("DOCURESEARCH_LLM_MODEL", raising=False)
     with pytest.raises(LLMConfigError):
         OpenAICompatibleLLM.from_env()
+
+
+def test_openai_compat_retries_rate_limits_then_succeeds(monkeypatch):
+    sleeps = []
+    monkeypatch.setattr("app.generation.openai_compat.time.sleep", sleeps.append)
+    statuses = iter([429, 503, 200])
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        status = next(statuses)
+        if status != 200:
+            return httpx.Response(status, headers={"retry-after": "1"} if status == 429 else {})
+        return httpx.Response(200, json={"choices": [{"message": {"content": _answer_json([])}}]})
+
+    resp = _llm_with(handler).generate("PROMPT")
+    assert resp.parse_error is None
+    assert sleeps == [1.0, 4.0]  # Retry-After honored, then exponential backoff
+
+
+def test_openai_compat_gives_up_after_max_retries(monkeypatch):
+    monkeypatch.setattr("app.generation.openai_compat.time.sleep", lambda s: None)
+    calls = []
+
+    def handler(request):
+        calls.append(1)
+        return httpx.Response(429)
+
+    resp = _llm_with(handler).generate("PROMPT")
+    assert "429" in resp.parse_error
+    assert len(calls) == 4  # first try + 3 retries
+
+
+def test_openai_compat_does_not_retry_client_errors(monkeypatch):
+    monkeypatch.setattr("app.generation.openai_compat.time.sleep", lambda s: None)
+    calls = []
+
+    def handler(request):
+        calls.append(1)
+        return httpx.Response(401)
+
+    assert "401" in _llm_with(handler).generate("PROMPT").parse_error
+    assert calls == [1]
+
+
+def test_openai_compat_retries_error_embedded_in_200_body(monkeypatch):
+    monkeypatch.setattr("app.generation.openai_compat.time.sleep", lambda s: None)
+    bodies = iter([
+        {"error": {"code": 429, "message": "Provider returned error",
+                   "metadata": {"raw": "rate-limited upstream"}}},
+        {"choices": [{"message": {"content": _answer_json([])}}]},
+    ])
+    resp = _llm_with(lambda r: httpx.Response(200, json=next(bodies))).generate("PROMPT")
+    assert resp.parse_error is None
+
+
+def test_openai_compat_reports_embedded_error_message(monkeypatch):
+    monkeypatch.setattr("app.generation.openai_compat.time.sleep", lambda s: None)
+    body = {"error": {"code": 400, "message": "Provider returned error",
+                      "metadata": {"raw": "model does not support this"}}}
+    resp = _llm_with(lambda r: httpx.Response(200, json=body)).generate("PROMPT")
+    assert "provider error 400" in resp.parse_error
+    assert "model does not support this" in resp.parse_error

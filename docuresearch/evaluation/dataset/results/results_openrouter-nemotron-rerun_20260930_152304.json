@@ -1,0 +1,104 @@
+{
+  "label": "openrouter-nemotron-rerun",
+  "timestamp": "20260930_152304",
+  "run_timestamp": "2026-09-30T15:22:49",
+  "question_count": 3,
+  "results": [
+    {
+      "question_id": "q-001",
+      "system_answer": "The encryption algorithm that must be used for data transmissions in the Alpha Protocol is AES-256.",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_name": "sample_spec.pdf",
+          "location": "page:1:chunk:0",
+          "excerpt": "Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first\npublished in 2019 and has been revised three times since then.\nSection 2: Security Requirements\nAll data transmissions using the Alpha Protocol must be encrypted with AES-256. The encryption key must\nbe rotated every 90 days. Each rotation requires generating a new key pair and securely distributing the\npublic key to all authorized recipients."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Security Requirements:chunk:1",
+          "document_name": "sample_spec.md",
+          "location": "Sample Technical Document / Security Requirements:chunk:1",
+          "excerpt": "Security Requirements\n\nAll data transmissions using the Alpha Protocol must be encrypted with AES-256. The encryption key must be rotated every 90 days. Each rotation requires generating a new key pair and securely distributing the public key to all authorized recipients."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "Two independent passages (one from the PDF specification and one from the markdown specification) explicitly state that all data transmissions using the Alpha Protocol must be encrypted with AES-256, providing clear and consistent support for the answer.",
+      "system_abstention": false,
+      "retrieval_precision": 0.1,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 1.0,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.042499028000747785,
+      "generation_latency_s": 9.64345329400021,
+      "total_latency_s": 9.685956452001847,
+      "run_timestamp": "2026-09-30T15:22:49",
+      "notes": ""
+    },
+    {
+      "question_id": "q-002",
+      "system_answer": "The encryption key must be rotated every 90 days.",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_name": "sample_spec.pdf",
+          "location": "page:1:chunk:0",
+          "excerpt": "Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first\npublished in 2019 and has been revised three times since then.\nSection 2: Security Requirements\nAll data transmissions using the Alpha Protocol must be encrypted with AES-256. The encryption key must\nbe rotated every 90 days. Each rotation requires generating a new key pair and securely distributing the\npublic key to all authorized recipients."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Security Requirements:chunk:1",
+          "document_name": "sample_spec.md",
+          "location": "Sample Technical Document / Security Requirements:chunk:1",
+          "excerpt": "Security Requirements\n\nAll data transmissions using the Alpha Protocol must be encrypted with AES-256. The encryption key must be rotated every 90 days. Each rotation requires generating a new key pair and securely distributing the public key to all authorized recipients."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "Two independent passages (one from the PDF spec and one from the markdown spec) explicitly state that the encryption key must be rotated every 90 days, providing clear and consistent support for the answer.",
+      "system_abstention": false,
+      "retrieval_precision": 0.1,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 1.0,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.026848639001400443,
+      "generation_latency_s": 6.490126186999987,
+      "total_latency_s": 6.51697612100179,
+      "run_timestamp": "2026-09-30T15:22:56",
+      "notes": ""
+    },
+    {
+      "question_id": "q-003",
+      "system_answer": "The two-step authentication process in the Alpha Protocol consists of: (1) the client presenting a signed token issued by the identity provider; and (2) the server validating the token against the current key registry, granting access if the token is valid and the key has not been revoked.",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_name": "sample_spec.pdf",
+          "location": "page:2:chunk:1",
+          "excerpt": "Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the server validates the token against the current key registry. If the token is valid and the key has\nnot been revoked, access is granted.\nSection 4: Performance Characteristics\nThe Alpha Protocol achieves a throughput of approximately 10,000 transactions per second on standard\nhardware. Latency under load is typically under 50 milliseconds for authenticated requests."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Authentication:chunk:2",
+          "document_name": "sample_spec.md",
+          "location": "Sample Technical Document / Authentication:chunk:2",
+          "excerpt": "Authentication\n\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider. Second, the server validates the token against the current key registry. If the token is valid and the key has not been revoked, access is granted."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "Two independent passages (one from the PDF spec and one from the markdown spec) explicitly describe the two-step authentication process in identical wording, providing clear and direct support for the answer.",
+      "system_abstention": false,
+      "retrieval_precision": 0.1,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 1.0,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.023427497999364277,
+      "generation_latency_s": 8.777481225999509,
+      "total_latency_s": 8.800909527999465,
+      "run_timestamp": "2026-09-30T15:23:04",
+      "notes": ""
+    }
+  ]
+}

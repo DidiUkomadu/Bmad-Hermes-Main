@@ -198,6 +198,13 @@ def list_passages_for_document(
     return [_row_to_passage(r) for r in rows]
 
 
+def rename_document(conn: sqlite3.Connection, doc_id: str, name: str) -> bool:
+    """Set a document's user-visible name. Returns False if it does not exist."""
+    cur = conn.execute("UPDATE documents SET name = ? WHERE id = ?", (name, doc_id))
+    conn.commit()
+    return cur.rowcount > 0
+
+
 def delete_document(conn: sqlite3.Connection, doc_id: str) -> bool:
     """Delete a document and all its passages (CASCADE).
 

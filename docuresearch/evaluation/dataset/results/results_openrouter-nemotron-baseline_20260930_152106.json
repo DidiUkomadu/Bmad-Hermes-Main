@@ -1,0 +1,690 @@
+{
+  "label": "openrouter-nemotron-baseline",
+  "timestamp": "20260930_152106",
+  "run_timestamp": "2026-09-30T15:18:35",
+  "question_count": 22,
+  "results": [
+    {
+      "question_id": "q-001",
+      "system_answer": "GENERATION FAILED: LLM request failed: 'choices'",
+      "system_citations": [],
+      "system_evidence_quality": null,
+      "system_evidence_narrative": "",
+      "system_abstention": false,
+      "retrieval_precision": 0.1,
+      "retrieval_recall": 1.0,
+      "citation_correctness": null,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.04165747799925157,
+      "generation_latency_s": 1.5660491650014592,
+      "total_latency_s": 1.6077087599987863,
+      "run_timestamp": "2026-09-30T15:18:35",
+      "notes": ""
+    },
+    {
+      "question_id": "q-002",
+      "system_answer": "GENERATION FAILED: LLM request failed: 'choices'",
+      "system_citations": [],
+      "system_evidence_quality": null,
+      "system_evidence_narrative": "",
+      "system_abstention": false,
+      "retrieval_precision": 0.1,
+      "retrieval_recall": 1.0,
+      "citation_correctness": null,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.05944992399963667,
+      "generation_latency_s": 0.6196160250001412,
+      "total_latency_s": 0.6790694810006244,
+      "run_timestamp": "2026-09-30T15:18:36",
+      "notes": ""
+    },
+    {
+      "question_id": "q-003",
+      "system_answer": "GENERATION FAILED: LLM request failed: 'choices'",
+      "system_citations": [],
+      "system_evidence_quality": null,
+      "system_evidence_narrative": "",
+      "system_abstention": false,
+      "retrieval_precision": 0.1,
+      "retrieval_recall": 1.0,
+      "citation_correctness": null,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.045600637000461575,
+      "generation_latency_s": 0.732835270002397,
+      "total_latency_s": 0.778437421999115,
+      "run_timestamp": "2026-09-30T15:18:37",
+      "notes": ""
+    },
+    {
+      "question_id": "q-004",
+      "system_answer": "The Alpha Protocol achieves a throughput of approximately 10,000 transactions per second on standard hardware.",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_name": "sample_spec.pdf",
+          "location": "page:2:chunk:1",
+          "excerpt": "Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the server validates the token against the current key registry. If the token is valid and the key has\nnot been revoked, access is granted.\nSection 4: Performance Characteristics\nThe Alpha Protocol achieves a throughput of approximately 10,000 transactions per second on standard\nhardware. Latency under load is typically under 50 milliseconds for authenticated requests."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Performance Characteristics:chunk:3",
+          "document_name": "sample_spec.md",
+          "location": "Sample Technical Document / Performance Characteristics:chunk:3",
+          "excerpt": "Performance Characteristics\n\nThe Alpha Protocol achieves a throughput of approximately 10,000 transactions per second on standard hardware. Latency under load is typically under 50 milliseconds for authenticated requests."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The answer is directly stated in two independent passages (Passage 2 and Passage 3) that both report the same throughput figure, providing clear and consistent evidence.",
+      "system_abstention": false,
+      "retrieval_precision": 0.1,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 1.0,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.0317280280032719,
+      "generation_latency_s": 10.893725141999312,
+      "total_latency_s": 10.925453569998353,
+      "run_timestamp": "2026-09-30T15:18:48",
+      "notes": ""
+    },
+    {
+      "question_id": "q-005",
+      "system_answer": "Under load, authenticated requests in the Alpha Protocol typically have latency under 50 milliseconds.",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Performance Characteristics:chunk:3",
+          "document_name": "sample_spec.md",
+          "location": "Sample Technical Document / Performance Characteristics:chunk:3",
+          "excerpt": "Performance Characteristics\n\nThe Alpha Protocol achieves a throughput of approximately 10,000 transactions per second on standard hardware. Latency under load is typically under 50 milliseconds for authenticated requests."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_name": "sample_spec.pdf",
+          "location": "page:2:chunk:1",
+          "excerpt": "Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the server validates the token against the current key registry. If the token is valid and the key has\nnot been revoked, access is granted.\nSection 4: Performance Characteristics\nThe Alpha Protocol achieves a throughput of approximately 10,000 transactions per second on standard\nhardware. Latency under load is typically under 50 milliseconds for authenticated requests."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "Two independent passages (one from sample_spec.md and one from sample_spec.pdf) both state that latency under load is typically under 50 milliseconds for authenticated requests, providing consistent and direct evidence.",
+      "system_abstention": false,
+      "retrieval_precision": 0.1,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 1.0,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.024514812997949775,
+      "generation_latency_s": 4.751583548000781,
+      "total_latency_s": 4.77609943400239,
+      "run_timestamp": "2026-09-30T15:18:52",
+      "notes": ""
+    },
+    {
+      "question_id": "q-006",
+      "system_answer": "The Alpha Protocol has two main limitations: it does not support multicast transmission, and it cannot be used over connections that lack a reliable transport layer.",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Limitations:chunk:4",
+          "document_name": "sample_spec.md",
+          "location": "Sample Technical Document / Limitations:chunk:4",
+          "excerpt": "Limitations\n\nThe protocol does not support multicast transmission. It also cannot be used over connections that do not provide a reliable transport layer."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:3:chunk:2",
+          "document_name": "sample_spec.pdf",
+          "location": "page:3:chunk:2",
+          "excerpt": "Section 5: Limitations\nThe protocol does not support multicast transmission. It also cannot be used over connections that do not\nprovide a reliable transport layer.\nSection 6: Revision History\nVersion 1.0 - 2019-03-15: Initial publication.\nVersion 2.0 - 2021-06-01: Added key rotation requirements.\nVersion 3.0 - 2023-11-20: Added authentication step two.\nVersion 4.0 - 2025-02-10: Current version, added performance benchmark requirements."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "Both passages directly state the limitations of the Alpha Protocol, providing clear and consistent information without conflict.",
+      "system_abstention": false,
+      "retrieval_precision": 0.1,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 1.0,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.03106968800057075,
+      "generation_latency_s": 8.165863296999305,
+      "total_latency_s": 8.196933876999537,
+      "run_timestamp": "2026-09-30T15:19:01",
+      "notes": ""
+    },
+    {
+      "question_id": "q-007",
+      "system_answer": "The most recent version of the Alpha Protocol is Version 4.0, published on 2025-02-10.",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:3:chunk:2",
+          "document_name": "sample_spec.pdf",
+          "location": "page:3:chunk:2",
+          "excerpt": "Section 5: Limitations\nThe protocol does not support multicast transmission. It also cannot be used over connections that do not\nprovide a reliable transport layer.\nSection 6: Revision History\nVersion 1.0 - 2019-03-15: Initial publication.\nVersion 2.0 - 2021-06-01: Added key rotation requirements.\nVersion 3.0 - 2023-11-20: Added authentication step two.\nVersion 4.0 - 2025-02-10: Current version, added performance benchmark requirements."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Revision History:chunk:5",
+          "document_name": "sample_spec.md",
+          "location": "Sample Technical Document / Revision History:chunk:5",
+          "excerpt": "Revision History\n\nVersion 1.0 \u2014 2019-03-15: Initial publication.\nVersion 2.0 \u2014 2021-06-01: Added key rotation requirements.\nVersion 3.0 \u2014 2023-11-20: Added authentication step two.\nVersion 4.0 \u2014 2025-02-10: Current version, added performance benchmark requirements."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "Both passages explicitly list the revision history, showing Version 4.0 with a publication date of 2025-02-10 as the current version.",
+      "system_abstention": false,
+      "retrieval_precision": 0.1,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 1.0,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.03482286999860662,
+      "generation_latency_s": 6.870654626000032,
+      "total_latency_s": 6.905478199001664,
+      "run_timestamp": "2026-09-30T15:19:07",
+      "notes": ""
+    },
+    {
+      "question_id": "q-008",
+      "system_answer": "The Alpha Protocol is a specification for secure data transmission. It was first published in 2019 and has been revised three times since then. The protocol requires AES-256 encryption with key rotation every 90 days, uses a two-step authentication process (signed token presentation and validation against a key registry), achieves approximately 10,000 transactions per second with sub\u201150\u202fms latency under load, does not support multicast transmission and requires a reliable transport layer, and has undergone version updates as detailed in its revision history.",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_name": "sample_spec.pdf",
+          "location": "page:1:chunk:0",
+          "excerpt": "Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first\npublished in 2019 and has been revised three times since then.\nSection 2: Security Requirements\nAll data transmissions using the Alpha Protocol must be encrypted with AES-256. The encryption key must\nbe rotated every 90 days. Each rotation requires generating a new key pair and securely distributing the\npublic key to all authorized recipients."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document:chunk:0",
+          "document_name": "sample_spec.md",
+          "location": "Sample Technical Document:chunk:0",
+          "excerpt": "Sample Technical Document Introduction\n\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first published in 2019 and has been revised three times since then."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Security Requirements:chunk:1",
+          "document_name": "sample_spec.md",
+          "location": "Sample Technical Document / Security Requirements:chunk:1",
+          "excerpt": "Security Requirements\n\nAll data transmissions using the Alpha Protocol must be encrypted with AES-256. The encryption key must be rotated every 90 days. Each rotation requires generating a new key pair and securely distributing the public key to all authorized recipients."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_name": "sample_spec.pdf",
+          "location": "page:2:chunk:1",
+          "excerpt": "Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the server validates the token against the current key registry. If the token is valid and the key has\nnot been revoked, access is granted.\nSection 4: Performance Characteristics\nThe Alpha Protocol achieves a throughput of approximately 10,000 transactions per second on standard\nhardware. Latency under load is typically under 50 milliseconds for authenticated requests."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Authentication:chunk:2",
+          "document_name": "sample_spec.md",
+          "location": "Sample Technical Document / Authentication:chunk:2",
+          "excerpt": "Authentication\n\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider. Second, the server validates the token against the current key registry. If the token is valid and the key has not been revoked, access is granted."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Performance Characteristics:chunk:3",
+          "document_name": "sample_spec.md",
+          "location": "Sample Technical Document / Performance Characteristics:chunk:3",
+          "excerpt": "Performance Characteristics\n\nThe Alpha Protocol achieves a throughput of approximately 10,000 transactions per second on standard hardware. Latency under load is typically under 50 milliseconds for authenticated requests."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Limitations:chunk:4",
+          "document_name": "sample_spec.md",
+          "location": "Sample Technical Document / Limitations:chunk:4",
+          "excerpt": "Limitations\n\nThe protocol does not support multicast transmission. It also cannot be used over connections that do not provide a reliable transport layer."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:3:chunk:2",
+          "document_name": "sample_spec.pdf",
+          "location": "page:3:chunk:2",
+          "excerpt": "Section 5: Limitations\nThe protocol does not support multicast transmission. It also cannot be used over connections that do not\nprovide a reliable transport layer.\nSection 6: Revision History\nVersion 1.0 - 2019-03-15: Initial publication.\nVersion 2.0 - 2021-06-01: Added key rotation requirements.\nVersion 3.0 - 2023-11-20: Added authentication step two.\nVersion 4.0 - 2025-02-10: Current version, added performance benchmark requirements."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "Multiple retrieved passages directly describe the Alpha Protocol, covering its purpose, publication timeline, security requirements, authentication mechanism, performance characteristics, limitations, and revision history. All key claims in the answer are explicitly supported by the provided text.",
+      "system_abstention": false,
+      "retrieval_precision": 0.1,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.25,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.025496997997834114,
+      "generation_latency_s": 20.69916701299735,
+      "total_latency_s": 20.72466551800244,
+      "run_timestamp": "2026-09-30T15:19:28",
+      "notes": ""
+    },
+    {
+      "question_id": "q-009",
+      "system_answer": "No, the Alpha Protocol does not support multicast transmission.",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Limitations:chunk:4",
+          "document_name": "sample_spec.md",
+          "location": "Sample Technical Document / Limitations:chunk:4",
+          "excerpt": "Limitations\n\nThe protocol does not support multicast transmission. It also cannot be used over connections that do not provide a reliable transport layer."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:3:chunk:2",
+          "document_name": "sample_spec.pdf",
+          "location": "page:3:chunk:2",
+          "excerpt": "Section 5: Limitations\nThe protocol does not support multicast transmission. It also cannot be used over connections that do not\nprovide a reliable transport layer.\nSection 6: Revision History\nVersion 1.0 - 2019-03-15: Initial publication.\nVersion 2.0 - 2021-06-01: Added key rotation requirements.\nVersion 3.0 - 2023-11-20: Added authentication step two.\nVersion 4.0 - 2025-02-10: Current version, added performance benchmark requirements."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "Two independent passages (one from sample_spec.md and one from sample_spec.pdf) explicitly state that the Alpha Protocol does not support multicast transmission, providing clear and consistent evidence.",
+      "system_abstention": false,
+      "retrieval_precision": 0.1,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 1.0,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.10130166999806534,
+      "generation_latency_s": 6.890250930999173,
+      "total_latency_s": 6.991554509997513,
+      "run_timestamp": "2026-09-30T15:19:35",
+      "notes": ""
+    },
+    {
+      "question_id": "q-010",
+      "system_answer": "The Omega Framework provides bindings for Python, Rust, and Go.",
+      "system_citations": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:6:chunk:5",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:6:chunk:5",
+          "excerpt": "The Omega Framework is written in C and provides bindings for Python, Rust, and Go. The Python bindings are the most widely used."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "Passage 1 directly states that the Omega Framework provides bindings for Python, Rust, and Go, fully answering the question.",
+      "system_abstention": false,
+      "retrieval_precision": 0.05,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 1.0,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.11948324200056959,
+      "generation_latency_s": 3.0984740189996955,
+      "total_latency_s": 3.2179586710008152,
+      "run_timestamp": "2026-09-30T15:19:38",
+      "notes": ""
+    },
+    {
+      "question_id": "q-011",
+      "system_answer": "Memory management in the Omega Framework is automatic; it uses a tracing garbage collector that runs in a background thread, so developers do not need to manually free memory.",
+      "system_citations": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:5:chunk:4",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:5:chunk:4",
+          "excerpt": "Memory management in the Omega Framework is automatic. The framework uses a tracing garbage collector that runs in a background thread. This means developers do not need to manually free memory."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The retrieved passage directly describes the memory management mechanism of the Omega Framework, providing a clear and complete answer to the question.",
+      "system_abstention": false,
+      "retrieval_precision": 0.05,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 1.0,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.09000658000149997,
+      "generation_latency_s": 11.96201256600034,
+      "total_latency_s": 12.05202054199981,
+      "run_timestamp": "2026-09-30T15:19:50",
+      "notes": ""
+    },
+    {
+      "question_id": "q-012",
+      "system_answer": "The Omega Framework supports two messaging patterns: request-reply (synchronous and blocking) and publish-subscribe (asynchronous and non-blocking).",
+      "system_citations": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:4:chunk:3",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:4:chunk:3",
+          "excerpt": "The framework supports two messaging patterns: request-reply and publish-subscribe. The request-reply pattern is synchronous and blocking. The publish-subscribe pattern is asynchronous and non-blocking."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The passage directly states the supported messaging patterns, providing clear and specific evidence.",
+      "system_abstention": false,
+      "retrieval_precision": 0.05,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 1.0,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.053442909997102106,
+      "generation_latency_s": 5.912365264000982,
+      "total_latency_s": 5.965809867000644,
+      "run_timestamp": "2026-09-30T15:19:56",
+      "notes": ""
+    },
+    {
+      "question_id": "q-013",
+      "system_answer": "The Omega Framework can process up to 50,000 messages per second on a single node.",
+      "system_citations": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:7:chunk:6",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:7:chunk:6",
+          "excerpt": "Performance benchmarks show that the Omega Framework can process up to 50,000 messages per second on a single node. For higher throughput, the framework supports clustering across up to 100 nodes."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "Passage 1 directly states the maximum throughput of the Omega Framework on a single node as 50,000 messages per second, providing clear and specific support for the answer.",
+      "system_abstention": false,
+      "retrieval_precision": 0.05,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 1.0,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.04501968499971554,
+      "generation_latency_s": 5.991995205000421,
+      "total_latency_s": 6.037015992998931,
+      "run_timestamp": "2026-09-30T15:20:02",
+      "notes": ""
+    },
+    {
+      "question_id": "q-014",
+      "system_answer": "The Omega Framework can cluster across up to 100 nodes.",
+      "system_citations": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:7:chunk:6",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:7:chunk:6",
+          "excerpt": "Performance benchmarks show that the Omega Framework can process up to 50,000 messages per second on a single node. For higher throughput, the framework supports clustering across up to 100 nodes."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "Passage 1 directly states that the framework supports clustering across up to 100 nodes, providing a clear and specific answer to the question.",
+      "system_abstention": false,
+      "retrieval_precision": 0.05,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 1.0,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.029576599998108577,
+      "generation_latency_s": 2.591955469997629,
+      "total_latency_s": 2.6215332779975142,
+      "run_timestamp": "2026-09-30T15:20:05",
+      "notes": ""
+    },
+    {
+      "question_id": "q-015",
+      "system_answer": "No, the Omega Framework does not include a built-in service discovery mechanism; services must be registered manually or through an external service registry.",
+      "system_citations": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:8:chunk:7",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:8:chunk:7",
+          "excerpt": "The framework does not include a built-in discovery mechanism. Services must be registered manually or through an external service registry."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "Passage 1 directly states that the framework does not include a built-in discovery mechanism, providing a clear answer to the question.",
+      "system_abstention": false,
+      "retrieval_precision": 0.05,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 1.0,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.03787219899822958,
+      "generation_latency_s": 3.7629541659989627,
+      "total_latency_s": 3.80082747400229,
+      "run_timestamp": "2026-09-30T15:20:09",
+      "notes": ""
+    },
+    {
+      "question_id": "q-016",
+      "system_answer": "The core API of the Omega Framework consists of only three functions: spawn, send, and receive.",
+      "system_citations": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:3:chunk:2",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:3:chunk:2",
+          "excerpt": "One of the key design goals of the Omega Framework is simplicity. The core API consists of only three functions: spawn, send, and receive. Despite this simplicity, the framework can handle complex coordination patterns."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The passage directly states that the core API consists of the three functions spawn, send, and receive, providing a clear and complete answer to the question.",
+      "system_abstention": false,
+      "retrieval_precision": 0.05,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 1.0,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.03178190000107861,
+      "generation_latency_s": 3.1151425229982124,
+      "total_latency_s": 3.1469267449974723,
+      "run_timestamp": "2026-09-30T15:20:12",
+      "notes": ""
+    },
+    {
+      "question_id": "q-017",
+      "system_answer": "The Alpha Protocol was first published in 2019, with the initial version (Version 1.0) released on March 15, 2019.",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_name": "sample_spec.pdf",
+          "location": "page:1:chunk:0",
+          "excerpt": "Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first\npublished in 2019 and has been revised three times since then.\nSection 2: Security Requirements\nAll data transmissions using the Alpha Protocol must be encrypted with AES-256. The encryption key must\nbe rotated every 90 days. Each rotation requires generating a new key pair and securely distributing the\npublic key to all authorized recipients."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:3:chunk:2",
+          "document_name": "sample_spec.pdf",
+          "location": "page:3:chunk:2",
+          "excerpt": "Section 5: Limitations\nThe protocol does not support multicast transmission. It also cannot be used over connections that do not\nprovide a reliable transport layer.\nSection 6: Revision History\nVersion 1.0 - 2019-03-15: Initial publication.\nVersion 2.0 - 2021-06-01: Added key rotation requirements.\nVersion 3.0 - 2023-11-20: Added authentication step two.\nVersion 4.0 - 2025-02-10: Current version, added performance benchmark requirements."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "Multiple retrieved passages directly state that the Alpha Protocol was first published in 2019, and the revision history specifies the initial publication date as March 15, 2019. The evidence is consistent and unambiguous.",
+      "system_abstention": false,
+      "retrieval_precision": 0.1,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.5,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.03742932899695006,
+      "generation_latency_s": 5.860475425000914,
+      "total_latency_s": 5.897906656002306,
+      "run_timestamp": "2026-09-30T15:20:18",
+      "notes": ""
+    },
+    {
+      "question_id": "q-018",
+      "system_answer": "The Alpha Protocol is a specification for secure data transmission that mandates AES-256 encryption with 90\u2011day key rotation, uses a two\u2011step token\u2011based authentication process, and delivers about 10,000 transactions per second with sub\u201150\u202fms latency. In contrast, the Omega Framework is a C\u2011based library for building distributed systems that emphasizes simplicity (a core API of spawn, send, and receive), provides language bindings for Python, Rust, and Go, supports synchronous request\u2011reply and asynchronous publish\u2011subscribe messaging patterns, was first released in 2020, and was designed at the Lambda Research Lab.",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_name": "sample_spec.pdf",
+          "location": "page:1:chunk:0",
+          "excerpt": "Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first\npublished in 2019 and has been revised three times since then.\nSection 2: Security Requirements\nAll data transmissions using the Alpha Protocol must be encrypted with AES-256. The encryption key must\nbe rotated every 90 days. Each rotation requires generating a new key pair and securely distributing the\npublic key to all authorized recipients."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document:chunk:0",
+          "document_name": "sample_spec.md",
+          "location": "Sample Technical Document:chunk:0",
+          "excerpt": "Sample Technical Document Introduction\n\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first published in 2019 and has been revised three times since then."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Security Requirements:chunk:1",
+          "document_name": "sample_spec.md",
+          "location": "Sample Technical Document / Security Requirements:chunk:1",
+          "excerpt": "Security Requirements\n\nAll data transmissions using the Alpha Protocol must be encrypted with AES-256. The encryption key must be rotated every 90 days. Each rotation requires generating a new key pair and securely distributing the public key to all authorized recipients."
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
+          "document_name": "sample_spec.pdf",
+          "location": "page:2:chunk:1",
+          "excerpt": "Section 3: Authentication\nAuthentication proceeds in two steps. First, the client presents a signed token issued by the identity provider.\nSecond, the server validates the token against the current key registry. If the token is valid and the key has\nnot been revoked, access is granted.\nSection 4: Performance Characteristics\nThe Alpha Protocol achieves a throughput of approximately 10,000 transactions per second on standard\nhardware. Latency under load is typically under 50 milliseconds for authenticated requests."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Performance Characteristics:chunk:3",
+          "document_name": "sample_spec.md",
+          "location": "Sample Technical Document / Performance Characteristics:chunk:3",
+          "excerpt": "Performance Characteristics\n\nThe Alpha Protocol achieves a throughput of approximately 10,000 transactions per second on standard hardware. Latency under load is typically under 50 milliseconds for authenticated requests."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:2:chunk:1",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:2:chunk:1",
+          "excerpt": "The Omega Framework is a library for building distributed systems. It was designed at the Lambda Research Lab and first released in 2020."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:3:chunk:2",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:3:chunk:2",
+          "excerpt": "One of the key design goals of the Omega Framework is simplicity. The core API consists of only three functions: spawn, send, and receive. Despite this simplicity, the framework can handle complex coordination patterns."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:6:chunk:5",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:6:chunk:5",
+          "excerpt": "The Omega Framework is written in C and provides bindings for Python, Rust, and Go. The Python bindings are the most widely used."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:4:chunk:3",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:4:chunk:3",
+          "excerpt": "The framework supports two messaging patterns: request-reply and publish-subscribe. The request-reply pattern is synchronous and blocking. The publish-subscribe pattern is asynchronous and non-blocking."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The retrieved passages contain explicit descriptions of both the Alpha Protocol (purpose, security, authentication, performance) and the Omega Framework (purpose, design goals, language/bindings, messaging patterns, release info). Each claim in the answer is directly supported by at least one passage, providing sufficient evidence to differentiate the two.",
+      "system_abstention": false,
+      "retrieval_precision": 0.15,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 0.3333333333333333,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.037833880000107456,
+      "generation_latency_s": 22.517849947002105,
+      "total_latency_s": 22.555689459997666,
+      "run_timestamp": "2026-09-30T15:20:40",
+      "notes": ""
+    },
+    {
+      "question_id": "q-019",
+      "system_answer": "The key rotation procedure for the Alpha Protocol requires rotating the encryption key every 90 days. Each rotation involves generating a new key pair and securely distributing the public key to all authorized recipients.",
+      "system_citations": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_name": "sample_spec.pdf",
+          "location": "page:1:chunk:0",
+          "excerpt": "Alpha Protocol Specification\nSection 1: Introduction\nThis document describes the Alpha Protocol for secure data transmission. The Alpha Protocol was first\npublished in 2019 and has been revised three times since then.\nSection 2: Security Requirements\nAll data transmissions using the Alpha Protocol must be encrypted with AES-256. The encryption key must\nbe rotated every 90 days. Each rotation requires generating a new key pair and securely distributing the\npublic key to all authorized recipients."
+        },
+        {
+          "passage_id": "sample-spec-md-b0f9ddb6:Sample Technical Document / Security Requirements:chunk:1",
+          "document_name": "sample_spec.md",
+          "location": "Sample Technical Document / Security Requirements:chunk:1",
+          "excerpt": "Security Requirements\n\nAll data transmissions using the Alpha Protocol must be encrypted with AES-256. The encryption key must be rotated every 90 days. Each rotation requires generating a new key pair and securely distributing the public key to all authorized recipients."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "Both retrieved passages directly state the key rotation frequency (every 90 days) and the exact steps (generate a new key pair and securely distribute the public key to all authorized recipients). The information is consistent across sources, providing full support for the answer.",
+      "system_abstention": false,
+      "retrieval_precision": null,
+      "retrieval_recall": null,
+      "citation_correctness": 0.0,
+      "answer_faithful": null,
+      "abstention_correct": false,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.024691117996553658,
+      "generation_latency_s": 6.7157249720003165,
+      "total_latency_s": 6.740416795000783,
+      "run_timestamp": "2026-09-30T15:20:47",
+      "notes": ""
+    },
+    {
+      "question_id": "q-020",
+      "system_answer": "The retrieved passages do not contain any information about the Alpha Protocol's maximum supported message payload size.",
+      "system_citations": [],
+      "system_evidence_quality": "insufficient",
+      "system_evidence_narrative": "None of the provided passages mention message payload size, maximum payload, or related limits for the Alpha Protocol. The passages cover introduction, security requirements, authentication, performance characteristics, limitations, and revision history, but omit any specification of payload size.",
+      "system_abstention": true,
+      "retrieval_precision": null,
+      "retrieval_recall": null,
+      "citation_correctness": null,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.04938909599877661,
+      "generation_latency_s": 7.585998230999394,
+      "total_latency_s": 7.635388231999968,
+      "run_timestamp": "2026-09-30T15:20:54",
+      "notes": ""
+    },
+    {
+      "question_id": "q-021",
+      "system_answer": "The Omega Framework handles automatic memory management.",
+      "system_citations": [
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:5:chunk:4",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:5:chunk:4",
+          "excerpt": "Memory management in the Omega Framework is automatic. The framework uses a tracing garbage collector that runs in a background thread. This means developers do not need to manually free memory."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "Passage 2 directly states that memory management in the Omega Framework is automatic, providing clear support for the answer.",
+      "system_abstention": false,
+      "retrieval_precision": 0.15,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 1.0,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.055572051998751704,
+      "generation_latency_s": 5.434149323999009,
+      "total_latency_s": 5.489722478996555,
+      "run_timestamp": "2026-09-30T15:21:00",
+      "notes": ""
+    },
+    {
+      "question_id": "q-022",
+      "system_answer": "The retrieved sources give conflicting release dates for the Omega Framework: the release notes state that Version 1.0 was first released to the public in March 2018, while another document states it was first released in 2020.",
+      "system_citations": [
+        {
+          "passage_id": "omega-release-notes-txt-a7ae4a34:paragraph:3:chunk:1",
+          "document_name": "omega_release_notes.txt",
+          "location": "paragraph:3:chunk:1",
+          "excerpt": "Version 1.0 of the Omega Framework was first released to the public in March 2018."
+        },
+        {
+          "passage_id": "sample-document-txt-27c030ba:paragraph:2:chunk:1",
+          "document_name": "sample_document.txt",
+          "location": "paragraph:2:chunk:1",
+          "excerpt": "The Omega Framework is a library for building distributed systems. It was designed at the Lambda Research Lab and first released in 2020."
+        }
+      ],
+      "system_evidence_quality": "conflicting",
+      "system_evidence_narrative": "Two passages provide different release dates: Passage 1 (omega_release_notes.txt) says March 2018, while Passage 2 (sample_document.txt) says 2020. This disagreement makes the evidence conflicting.",
+      "system_abstention": false,
+      "retrieval_precision": 0.1,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 1.0,
+      "answer_faithful": null,
+      "abstention_correct": true,
+      "conflict_handled": true,
+      "retrieval_latency_s": 0.058967851000488736,
+      "generation_latency_s": 5.886195078997844,
+      "total_latency_s": 5.945165040997381,
+      "run_timestamp": "2026-09-30T15:21:06",
+      "notes": ""
+    }
+  ]
+}

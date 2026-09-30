@@ -64,3 +64,21 @@ def answer_json(citations: list[str], quality: str = "sufficient", text: str = "
         "evidence_quality_narrative": "narrative",
         "is_abstention": quality == "insufficient",
     })
+
+
+class CiteLLM(ScriptedLLM):
+    """Cites the first retrieved passage containing the scripted phrase for each turn.
+
+    With no matching passage it answers "insufficient" with no citations.
+    """
+
+    def __init__(self, phrases: list[str]):
+        self._phrases = list(phrases)
+        super().__init__(self._respond_to)
+
+    def _respond_to(self, prompt: str) -> str:
+        phrase = self._phrases.pop(0)
+        hits = [pid for pid, text in passages_in(prompt) if phrase.lower() in text.lower()]
+        if not hits:
+            return answer_json([], quality="insufficient", text="Not in the documents.")
+        return answer_json([hits[0]], text=f"Answer citing '{phrase}'.")

@@ -1,0 +1,26 @@
+# DocuResearch configuration. Copy to config.toml to customise.
+# Environment variables override these values (see app/config.py).
+# Never put secrets here: the LLM API key is read only from DOCURESEARCH_LLM_API_KEY.
+
+[storage]
+# Relative paths are resolved from the docuresearch/ directory.
+db_path = "data/storage/docuresearch.db"
+
+[retrieval]
+embedding_model = "all-MiniLM-L6-v2"
+max_candidates = 20
+semantic_weight = 0.5
+keyword_weight = 0.5
+
+[conversation]
+# Turns (question + answer pairs) kept per session.
+max_turns = 5
+
+[llm]
+# Any OpenAI-compatible /chat/completions endpoint.
+# Nous Portal: https://inference-api.nousresearch.com/v1
+# OpenRouter:  https://openrouter.ai/api/v1
+# Ollama:      http://localhost:11434/v1
+base_url = "https://inference-api.nousresearch.com/v1"
+model = ""
+timeout_seconds = 120

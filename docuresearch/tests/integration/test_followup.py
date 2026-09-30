@@ -16,29 +16,14 @@ from app.retrieval.interface import DocumentScope
 from app.store.schema import get_connection
 from tests.integration.fakes import (
     DOCS,
+    CiteLLM,
     HashEmbedding,
     ScriptedLLM,
     answer_json,
     passage_ids_in,
-    passages_in,
 )
 
 HISTORY_IS_CONTEXT_ONLY = "The conversation history is context only, not a source."
-
-
-class CiteLLM(ScriptedLLM):
-    """Cites the first retrieved passage containing the scripted phrase for each turn."""
-
-    def __init__(self, phrases: list[str]):
-        self._phrases = list(phrases)
-        super().__init__(self._respond_to)
-
-    def _respond_to(self, prompt: str) -> str:
-        phrase = self._phrases.pop(0)
-        hits = [pid for pid, text in passages_in(prompt) if phrase.lower() in text.lower()]
-        if not hits:
-            return answer_json([], quality="insufficient", text="Not in the documents.")
-        return answer_json([hits[0]], text=f"Answer citing '{phrase}'.")
 
 
 @pytest.fixture

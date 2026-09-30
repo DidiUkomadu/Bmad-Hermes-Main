@@ -21,11 +21,21 @@ from app.store.schema import (
     create_document,
     create_passage,
     create_schema,
+    delete_document,
     get_connection,
+    get_document,
     set_db_path,
 )
 
 logger = logging.getLogger(__name__)
+
+
+class EmptyDocumentError(ValueError):
+    """The document parsed but yielded no extractable text (e.g. a scanned PDF)."""
+
+
+class DuplicateDocumentError(ValueError):
+    """A document with the same ID (same filename) is already stored."""
 
 
 # ---------------------------------------------------------------------------
@@ -220,20 +230,11 @@ def _ingest(
     config = chunking_config if chunking_config is not None else ChunkingConfig()
     passages = chunk_passages(raw, config)
     logger.info("Chunked %s into %d passages", raw.name, len(passages))
-
-    # 3b. Embed (optional)
-    if embedding_model is not None:
-        for p in passages:
-            p.embedding = embedding_model.embed(p.text)
-        logger.info("Embedded %d passages for %s", len(passages), raw.name)
-
-    # 4. Persist
-    if db_path is not None:
-        set_db_path(db_path)
-    conn = get_connection()
-
-    # Ensure schema exists
-    create_schema(conn)
+    if not passages:
+        raise EmptyDocumentError(
+            f"No extractable text found in {raw.name}. Scanned (image-only) PDFs are "
+            "not supported in the MVP."
+        )
 
     # Determine page_count for DocumentMeta
     if fmt == DocumentFormat.PDF:
@@ -241,21 +242,50 @@ def _ingest(
     else:
         page_count = None
 
-    doc_meta = DocumentMeta(
-        id=raw.document_id,
-        name=raw.name,
-        format=raw.format,
-        uploaded_at=raw.uploaded_at,
-        page_count=page_count,
-    )
-    create_document(conn, doc_meta)
+    if db_path is not None:
+        set_db_path(db_path)
+    conn = get_connection()
+    try:
+        # Ensure schema exists
+        create_schema(conn)
 
-    passage_ids: list[str] = []
-    for p in passages:
-        create_passage(conn, p)
-        passage_ids.append(p.id)
+        # Reject duplicates before the (potentially slow) embedding step.
+        if get_document(conn, raw.document_id) is not None:
+            raise DuplicateDocumentError(
+                f"Document '{raw.name}' is already stored as {raw.document_id}. "
+                "Remove it before uploading it again."
+            )
 
-    conn.commit()
+        # 3b. Embed (optional)
+        if embedding_model is not None:
+            for p in passages:
+                p.embedding = embedding_model.embed(p.text)
+            logger.info("Embedded %d passages for %s", len(passages), raw.name)
+
+        # 4. Persist — all-or-nothing: never leave a document with only some
+        # of its passages.
+        create_document(
+            conn,
+            DocumentMeta(
+                id=raw.document_id,
+                name=raw.name,
+                format=raw.format,
+                uploaded_at=raw.uploaded_at,
+                page_count=page_count,
+            ),
+        )
+        passage_ids: list[str] = []
+        try:
+            for p in passages:
+                create_passage(conn, p)
+                passage_ids.append(p.id)
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            delete_document(conn, raw.document_id)
+            raise
+    finally:
+        conn.close()
 
     logger.info("Persisted %s: %d passages in %s",
                 raw.name, len(passages), db_path or "default db")
@@ -271,6 +301,8 @@ def _ingest(
 
 
 __all__ = [
+    "DuplicateDocumentError",
+    "EmptyDocumentError",
     "detect_format",
     "ingest_document",
     "ingest_document_bytes",
