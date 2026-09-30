@@ -7,63 +7,19 @@ external dependencies (LLM and embedding model) are replaced.
 
 from __future__ import annotations
 
-import hashlib
 import json
-import math
-import re
 from pathlib import Path
 
 import httpx
 import pytest
 
-from app.generation.interface import EvidenceQuality, LLMResponse
+from app.generation.interface import EvidenceQuality
 from app.generation.openai_compat import LLMConfigError, OpenAICompatibleLLM
 from app.generation.post_process import UNGROUNDED_ANSWER_TEXT
 from app.pipeline import NO_PASSAGES_ANSWER_TEXT, GenerationError, ResearchPipeline
-
-DOCS = Path(__file__).resolve().parents[2] / "evaluation" / "dataset" / "documents"
-
-
-class HashEmbedding:
-    """Deterministic bag-of-words embedding (no model download)."""
-
-    dimension = 64
-
-    def embed(self, text: str) -> list[float]:
-        vec = [0.0] * self.dimension
-        for tok in re.findall(r"[a-z0-9]+", text.lower()):
-            vec[int(hashlib.md5(tok.encode()).hexdigest(), 16) % self.dimension] += 1.0
-        norm = math.sqrt(sum(v * v for v in vec)) or 1.0
-        return [v / norm for v in vec]
-
-
-class ScriptedLLM:
-    """Returns a response built from the prompt by a test-supplied function."""
-
-    def __init__(self, respond):
-        self._respond = respond
-        self.prompts: list[str] = []
-
-    def generate(self, prompt: str, **kwargs) -> LLMResponse:
-        self.prompts.append(prompt)
-        return LLMResponse(raw_text=self._respond(prompt))
-
-
-def _passage_ids_in(prompt: str) -> list[str]:
-    return re.findall(r"\*\*Passage ID:\*\* (\S+)", prompt)
-
-
-def _answer_json(citations: list[str], quality: str = "sufficient", text: str = "AES-256.") -> str:
-    return json.dumps({
-        "answer_text": text,
-        "citations": [
-            {"passage_id": pid, "document_name": "model-supplied", "location": "model-supplied"}
-            for pid in citations
-        ],
-        "evidence_quality": quality,
-        "evidence_quality_narrative": "narrative",
-        "is_abstention": quality == "insufficient",
-    })
+from tests.integration.fakes import DOCS, HashEmbedding, ScriptedLLM
+from tests.integration.fakes import answer_json as _answer_json
+from tests.integration.fakes import passage_ids_in as _passage_ids_in
 
 
 def _pipeline(tmp_path: Path, llm) -> ResearchPipeline:

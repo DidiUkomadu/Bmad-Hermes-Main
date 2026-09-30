@@ -315,6 +315,9 @@ This is the first turn in the conversation. No prior context is available."""
     parts.append(
         "\nUse the conversation history to maintain consistency with prior answers. "
         "Do not contradict earlier answers unless the retrieved passages clearly support "
-        "a different conclusion."
+        "a different conclusion.\n"
+        "The conversation history is context only, not a source. Every claim in your "
+        "answer must be supported by, and cite, the retrieved passages above; do not "
+        "cite or repeat earlier answers as evidence."
     )
     return "\n".join(parts)

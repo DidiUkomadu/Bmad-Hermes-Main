@@ -116,6 +116,11 @@ class ResearchPipeline:
         create_schema(conn)
         conn.close()
 
+    @property
+    def db_path(self) -> str:
+        """Path to the SQLite content store this pipeline reads and writes."""
+        return self._db_path
+
     # ------------------------------------------------------------------
     # Ingestion
     # ------------------------------------------------------------------
@@ -148,9 +153,15 @@ class ResearchPipeline:
         query: str,
         document_id: str | None = None,
         conversation_history: list[ConversationTurn] | None = None,
+        retrieval_query: str | None = None,
     ) -> PipelineResult:
-        """Answer *query*, optionally restricted to one document."""
-        context = self.retrieve(query, document_id, conversation_history)
+        """Answer *query*, optionally restricted to one document.
+
+        *retrieval_query*, when given, is searched instead of *query* (e.g. a
+        follow-up expanded with conversation context); the prompt always
+        carries the user's *query* verbatim.
+        """
+        context = self.retrieve(query, document_id, conversation_history, retrieval_query)
         return PipelineResult(answer=self.generate(context), context=context)
 
     def retrieve(
@@ -158,6 +169,7 @@ class ResearchPipeline:
         query: str,
         document_id: str | None = None,
         conversation_history: list[ConversationTurn] | None = None,
+        retrieval_query: str | None = None,
     ) -> RetrievedContext:
         """Run scoped hybrid retrieval and package the result for generation."""
         start = time.monotonic()
@@ -204,7 +216,7 @@ class ResearchPipeline:
             ],
             scope,
         )
-        results = retriever.search(query, top_n=self._ranking.max_candidates)
+        results = retriever.search(retrieval_query or query, top_n=self._ranking.max_candidates)
         ranked = self._ranking.rank(results, latency_seconds=time.monotonic() - start)
 
         return RetrievedContext(
