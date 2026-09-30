@@ -32,6 +32,7 @@ def get_citation(
         document_id=passage.document_id,
         document_name=passage.document_name,
         location=passage.location,
+        location_label=passage.location_label,
         text=passage.text,
         start_offset=passage.start_offset,
         end_offset=passage.end_offset,

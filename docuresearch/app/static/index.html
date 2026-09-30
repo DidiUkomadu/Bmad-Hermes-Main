@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DocuResearch</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <h1>DocuResearch</h1>
+      <p>Answers from your documents, with every claim traceable to its source.</p>
+    </div>
+    <p id="llm-status" class="status" role="status"></p>
+  </header>
+
+  <div class="layout">
+    <aside class="panel documents" aria-labelledby="docs-heading">
+      <h2 id="docs-heading">Documents</h2>
+      <form id="upload-form" class="upload">
+        <label for="upload-file">Add a PDF, Markdown or text file</label>
+        <input id="upload-file" name="file" type="file" accept=".pdf,.md,.markdown,.txt" required>
+        <label for="upload-name">Display name <span class="hint">(optional)</span></label>
+        <input id="upload-name" name="name" type="text" placeholder="e.g. Alpha Protocol Spec">
+        <button type="submit">Upload</button>
+        <p id="upload-message" class="message" role="status"></p>
+      </form>
+      <ul id="document-list" class="document-list"></ul>
+      <p id="document-empty" class="empty">No documents yet. Upload one to start asking questions.</p>
+    </aside>
+
+    <main class="panel conversation" aria-labelledby="ask-heading">
+      <h2 id="ask-heading" class="visually-hidden">Ask a question</h2>
+      <ol id="thread" class="thread" aria-live="polite"></ol>
+      <p id="thread-empty" class="empty">
+        Ask a question about your documents. Click a numbered reference in an answer to see the
+        exact passage it came from.
+      </p>
+
+      <form id="ask-form" class="ask">
+        <div class="ask-controls">
+          <label for="scope">Search</label>
+          <select id="scope" name="scope">
+            <option value="">All documents</option>
+          </select>
+          <button id="new-conversation" type="button" class="secondary">New conversation</button>
+        </div>
+        <label for="question" class="visually-hidden">Question</label>
+        <textarea id="question" name="question" rows="3" required
+                  placeholder="e.g. How often must the encryption key be rotated?"></textarea>
+        <div class="ask-actions">
+          <p id="ask-message" class="message" role="status"></p>
+          <button id="ask-button" type="submit">Ask</button>
+        </div>
+      </form>
+    </main>
+  </div>
+</body>
+</html>

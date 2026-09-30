@@ -6,8 +6,35 @@ store, plus its document name and location. Nothing here is generated.
 
 from __future__ import annotations
 
+import re
 import sqlite3
 from dataclasses import dataclass
+
+_CHUNK_SUFFIX = re.compile(r":chunk:\d+$")
+
+
+def format_location(location: str) -> str:
+    """Human-readable form of a stored passage location.
+
+    Stored locations carry a chunk suffix used for stable passage IDs:
+        page:2:chunk:1                 -> "Page 2"
+        paragraph:5:chunk:4            -> "Paragraph 5"
+        Doc / Security:chunk:1         -> "Section: Doc › Security"
+        ¶chunk:3                       -> "Passage 4"
+    Unrecognised values are returned unchanged.
+    """
+    if location.startswith("¶chunk:"):
+        index = location.removeprefix("¶chunk:")
+        return f"Passage {int(index) + 1}" if index.isdigit() else location
+    base = _CHUNK_SUFFIX.sub("", location)
+    kind, _, number = base.partition(":")
+    if kind == "page" and number.isdigit():
+        return f"Page {number}"
+    if kind == "paragraph" and number.isdigit():
+        return f"Paragraph {number}"
+    if base and base != location:
+        return "Section: " + " › ".join(part.strip() for part in base.split(" / "))
+    return location
 
 
 @dataclass(frozen=True)
@@ -19,6 +46,10 @@ class ResolvedPassage:
     text: str
     start_offset: int
     end_offset: int
+
+    @property
+    def location_label(self) -> str:
+        return format_location(self.location)
 
 
 def resolve_passage(conn: sqlite3.Connection, passage_id: str) -> ResolvedPassage | None:

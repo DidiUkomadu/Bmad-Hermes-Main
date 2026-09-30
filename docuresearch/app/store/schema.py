@@ -37,10 +37,17 @@ def get_db_path() -> str:
     return DB_PATH
 
 
-def get_connection() -> sqlite3.Connection:
-    """Get a connection to the SQLite database."""
+def get_connection(check_same_thread: bool = True) -> sqlite3.Connection:
+    """Get a connection to the SQLite database.
+
+    Args:
+        check_same_thread: Passed to ``sqlite3.connect``. Set False only for a
+            connection owned by one unit of work that may hop threads but is
+            never used concurrently (e.g. one API request, whose dependency and
+            handler can run on different worker threads).
+    """
     path = get_db_path()
-    conn = sqlite3.connect(path)
+    conn = sqlite3.connect(path, check_same_thread=check_same_thread)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     return conn

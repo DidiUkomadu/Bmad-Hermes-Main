@@ -39,6 +39,8 @@ Without an LLM, the app still starts. Upload, listing, removal and citation look
 uvicorn app.main:app --reload
 ```
 
+Open http://localhost:8000 for the app. Upload documents, ask questions, and click a numbered reference (for example **[1] sample_spec.pdf · Page 1**) to expand the exact stored passage behind it. Follow-up questions keep the conversation's context until you click **New conversation**.
+
 The interactive API docs are at http://localhost:8000/docs.
 
 | Endpoint | Purpose |

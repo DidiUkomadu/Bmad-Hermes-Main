@@ -3,6 +3,8 @@
 Run locally (from the docuresearch/ directory):
     uvicorn app.main:app --reload
 
+then open http://localhost:8000 for the UI (Epic 6) or /docs for the API.
+
 The app starts without an LLM configured: document upload, listing, removal,
 and citation lookup work; question endpoints return 503 until
 DOCURESEARCH_LLM_BASE_URL and DOCURESEARCH_LLM_MODEL are set.
@@ -13,8 +15,11 @@ from __future__ import annotations
 import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.api import citations, documents, query
 from app.api.deps import AppState
@@ -29,6 +34,7 @@ from app.retrieval.semantic import SentenceTransformerEmbeddingModel
 logger = logging.getLogger(__name__)
 
 API_PREFIX = "/api/v1"
+STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 _LLM_NOT_CONFIGURED = (
     "Set DOCURESEARCH_LLM_BASE_URL and DOCURESEARCH_LLM_MODEL (and DOCURESEARCH_LLM_API_KEY "
@@ -110,6 +116,13 @@ def create_app(
     def health() -> dict[str, object]:
         state: AppState = app.state.docuresearch
         return {"status": "ok", "llm_configured": state.llm_unavailable_reason is None}
+
+    # Citation UI (Epic 6): plain HTML + JS, no build step (implementation plan §14.8).
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+    @app.get("/", include_in_schema=False)
+    def ui() -> FileResponse:
+        return FileResponse(STATIC_DIR / "index.html")
 
     return app
 

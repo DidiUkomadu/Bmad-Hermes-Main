@@ -77,6 +77,7 @@ class CitationModel(BaseModel):
     passage_id: str
     document_name: str
     location: str
+    location_label: str  # human-readable location, e.g. "Page 2"
     excerpt: str
 
 
@@ -131,6 +132,7 @@ class PassageResponse(BaseModel):
     document_id: str
     document_name: str
     location: str
+    location_label: str
     text: str
     start_offset: int
     end_offset: int

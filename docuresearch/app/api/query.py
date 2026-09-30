@@ -25,6 +25,7 @@ from app.api.schemas import (
     SessionCreateRequest,
     SessionCreateResponse,
 )
+from app.citation import format_location
 from app.conversation import SessionNotFoundError, ask, create_session, get_session
 from app.pipeline import GenerationError, PipelineResult
 
@@ -40,6 +41,7 @@ def _answer_model(result: PipelineResult, total_seconds: float) -> AnswerModel:
                 passage_id=c.passage_id,
                 document_name=c.document_name,
                 location=c.location,
+                location_label=format_location(c.location),
                 excerpt=c.excerpt,
             )
             for c in answer.citations

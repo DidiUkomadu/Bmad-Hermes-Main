@@ -26,9 +26,14 @@ def get_state(request: Request) -> AppState:
 
 
 def get_conn(request: Request) -> Iterator[sqlite3.Connection]:
-    """A store connection for the duration of one request."""
+    """A store connection for the duration of one request.
+
+    FastAPI may run this dependency and the (sync) handler on different worker
+    threads, so the same-thread check is disabled. The connection is still
+    private to this request and used sequentially.
+    """
     set_db_path(get_state(request).pipeline.db_path)
-    conn = get_connection()
+    conn = get_connection(check_same_thread=False)
     try:
         yield conn
     finally:

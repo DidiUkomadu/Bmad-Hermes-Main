@@ -361,3 +361,29 @@ def test_shutdown_closes_llm_client(tmp_path, monkeypatch):
     with TestClient(create_app(settings)) as client:
         assert client.get(f"{API}/health").json()["llm_configured"] is True
     assert closed == [1]
+
+
+def test_concurrent_requests_do_not_share_connections_across_threads(make_client):
+    """Regression: the UI loads several citations at once (found in a browser check).
+
+    The request-scoped connection is opened in the dependency and used by the
+    handler, which FastAPI may run on different worker threads.
+    """
+    from concurrent.futures import ThreadPoolExecutor
+
+    client = make_client()
+    _upload(client, "sample_spec.md")
+    _upload(client, "sample_document.txt")
+    ids = [
+        "sample-spec-md-b0f9ddb6:Sample Technical Document:chunk:0",
+        "sample-document-txt-27c030ba:paragraph:5:chunk:4",
+        Q001_GOLD,  # not uploaded here: 404 is fine, 500 is not
+    ]
+
+    def lookup(i):
+        return client.get(f"{API}/citations/{quote(ids[i % len(ids)])}").status_code
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        statuses = list(pool.map(lookup, range(60)))
+    assert set(statuses) <= {200, 404}, statuses
+    assert statuses.count(200) == 40
