@@ -39,6 +39,7 @@ from __future__ import annotations
 
 import json
 import re
+from datetime import UTC, datetime
 from typing import Any
 
 import pytest
@@ -146,11 +147,15 @@ def conversation_context(
             user_query="What is the document about?",
             answer_text="This document covers security standards including encryption and access control.",
             citations=[
-                {"passage_id": "doc-abc123:page:1:chunk:0", "document_name": "Security Standards Manual", "location": "Page 1"}
+                Citation(
+                    passage_id="doc-abc123:page:1:chunk:0",
+                    document_name="Security Standards Manual",
+                    location="Page 1",
+                )
             ],
-            evidence_quality="sufficient",
+            evidence_quality=EvidenceQuality.SUFFICIENT,
             is_abstention=False,
-            created_at="2026-09-21T10:00:00",
+            created_at=datetime(2026, 9, 21, 10, 0, tzinfo=UTC),
         ),
     ]
     return RetrievedContext(

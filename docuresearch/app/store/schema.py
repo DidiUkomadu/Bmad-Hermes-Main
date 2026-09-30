@@ -7,6 +7,10 @@ Tables:
     documents — id, name, format, uploaded_at, page_count, section_count
     passages  — id, document_id (FK), text, location, start_offset, end_offset,
                 embedding (nullable)
+    conversations      — session_id, created_at, current_document_scope (JSON, nullable)
+    conversation_turns — session_id (FK, cascade), turn_index, user_query, answer_text,
+                         citations (JSON), evidence_quality, is_abstention, created_at
+                         (managed by app.conversation.session, Story 5.1)
 """
 
 from __future__ import annotations
@@ -76,6 +80,33 @@ def create_schema(conn: sqlite3.Connection) -> None:
     # Index for listing passages by document
     conn.execute("""
         CREATE INDEX IF NOT EXISTS idx_passages_doc ON passages(document_id)
+    """)
+
+    # Conversation sessions and turns (Story 5.1, implementation plan §6.3–6.4)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS conversations (
+            session_id TEXT PRIMARY KEY,
+            created_at TEXT NOT NULL,
+            current_document_scope TEXT
+        )
+    """)
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS conversation_turns (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id TEXT NOT NULL
+                REFERENCES conversations(session_id) ON DELETE CASCADE,
+            turn_index INTEGER NOT NULL,
+            user_query TEXT NOT NULL,
+            answer_text TEXT NOT NULL,
+            citations TEXT NOT NULL,
+            evidence_quality TEXT NOT NULL CHECK (
+                evidence_quality IN ('sufficient', 'partial', 'insufficient', 'conflicting')
+            ),
+            is_abstention INTEGER NOT NULL CHECK (is_abstention IN (0, 1)),
+            created_at TEXT NOT NULL,
+            UNIQUE(session_id, turn_index)
+        )
     """)
 
     conn.commit()

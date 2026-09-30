@@ -31,9 +31,10 @@ Do NOT implement:
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Any
 
-from app.generation.interface import GenerationConfig
+from app.generation.interface import Citation, EvidenceQuality, GenerationConfig
 
 # ---------------------------------------------------------------------------
 # Boundary types (retrieval → generation)
@@ -45,16 +46,17 @@ class ConversationTurn:
     """A single turn in a conversation session.
 
     Present in RetrievedContext.conversation_history when the query is
-    part of an ongoing conversation.
+    part of an ongoing conversation. Persisted and loaded by
+    ``app.conversation.session`` (Story 5.1).
     """
 
     turn_index: int
     user_query: str
     answer_text: str
-    citations: list[dict[str, Any]]
-    evidence_quality: str
+    citations: list[Citation]
+    evidence_quality: EvidenceQuality
     is_abstention: bool
-    created_at: str
+    created_at: datetime
 
 
 @dataclass(frozen=True)
