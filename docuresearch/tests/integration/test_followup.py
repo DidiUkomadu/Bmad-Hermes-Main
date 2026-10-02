@@ -197,3 +197,131 @@ def test_invalid_scope_rejected(docs, scope):
     pipeline, _ = docs(CiteLLM([]))
     with pytest.raises(ValueError):
         ask(pipeline, "q", scope=scope)
+
+
+# ---------------------------------------------------------------------------
+# Follow-ups build on the earlier answer
+# ---------------------------------------------------------------------------
+
+
+def _small_candidate_pipeline(tmp_path, llm, max_candidates=1):
+    pipeline = ResearchPipeline(str(tmp_path / "c.db"), llm, embedding_model=HashEmbedding(),
+                                max_candidates=max_candidates)
+    ids = {name: pipeline.ingest(DOCS / name)["document_id"]
+           for name in ("sample_spec.md", "sample_document.txt")}
+    return pipeline, ids
+
+
+def test_follow_up_carries_forward_passage_cited_by_earlier_answer(tmp_path, monkeypatch):
+    """The follow-up's own search misses the earlier evidence; it is carried forward.
+
+    Query expansion alone would usually recover it, so it is switched off here to
+    isolate the carry-forward mechanism.
+    """
+    monkeypatch.setattr("app.conversation.followup._retrieval_query", lambda q, h: q)
+    llm = CiteLLM(["rotated every 90 days", "rotated every 90 days"])
+    pipeline, _ = _small_candidate_pipeline(tmp_path, llm, max_candidates=1)
+
+    first = ask(pipeline, "How often must the encryption key be rotated?")
+    [cited] = first.result.answer.citations
+    assert "rotated every 90 days" in cited.excerpt
+
+    follow = ask(pipeline, "Tell me about garbage collection threads", session_id=first.session_id)
+    ids = [p.passage_id for p in follow.result.context.passages]
+    assert ids[0] == cited.passage_id  # carried forward, placed first
+    assert len(ids) == 2 and ids[1] != cited.passage_id  # plus the follow-up's own result
+    # The model could cite the earlier evidence, and the citation is accepted.
+    assert follow.result.answer.citations[0].passage_id == cited.passage_id
+    assert follow.result.answer.evidence_quality is EvidenceQuality.SUFFICIENT
+
+
+def test_carried_passages_respect_new_scope_and_removed_documents(tmp_path):
+    llm = CiteLLM(["rotated every 90 days", "x", "x"])
+    pipeline, ids = _small_candidate_pipeline(tmp_path, llm, max_candidates=1)
+    first = ask(pipeline, "How often must the encryption key be rotated?")
+    cited = first.result.answer.citations[0].passage_id
+
+    txt_only = DocumentScope(mode="specific", document_id=ids["sample_document.txt"])
+    scoped = ask(pipeline, "And memory?", session_id=first.session_id, scope=txt_only)
+    assert cited not in [p.passage_id for p in scoped.result.context.passages]
+
+    conn = get_connection()
+    try:
+        from app.store.schema import delete_document
+        delete_document(conn, ids["sample_spec.md"])
+    finally:
+        conn.close()
+    after_removal = ask(pipeline, "Again?", session_id=first.session_id,
+                        scope=DocumentScope(mode="all"))
+    assert cited not in [p.passage_id for p in after_removal.result.context.passages]
+
+
+def test_at_most_three_passages_are_carried_forward(tmp_path, monkeypatch):
+    import app.conversation.followup as followup
+
+    pipeline, _ = _small_candidate_pipeline(tmp_path, ScriptedLLM(lambda p: ""), max_candidates=20)
+    # Every earlier answer cited many passages.
+    many = passage_ids_in_store(pipeline)
+
+    def cite_all(prompt):
+        return answer_json(many)
+
+    pipeline._llm = ScriptedLLM(cite_all)
+    first = ask(pipeline, "Tell me everything")
+    assert len(first.result.answer.citations) > followup.MAX_CARRIED_PASSAGES
+
+    pipeline._ranking.configure(1)
+    follow = ask(pipeline, "More?", session_id=first.session_id)
+    assert len(follow.result.context.passages) <= followup.MAX_CARRIED_PASSAGES + 1
+
+
+def passage_ids_in_store(pipeline):
+    conn = get_connection()
+    try:
+        return [r["id"] for r in conn.execute("SELECT id FROM passages ORDER BY id")]
+    finally:
+        conn.close()
+
+
+def test_follow_up_prompt_lists_sources_cited_by_earlier_answers(docs):
+    llm = CiteLLM(["rotated every 90 days", "public key"])
+    pipeline, _ = docs(llm)
+    first = ask(pipeline, "How often must the encryption key be rotated?")
+    ask(pipeline, "What must be distributed after each one?", session_id=first.session_id)
+
+    cited = first.result.answer.citations[0]
+    assert f"Sources cited: {cited.document_name}, {cited.location} " \
+           f"(Passage ID: {cited.passage_id})" in llm.prompts[1]
+
+
+def test_retrieval_query_uses_previous_question_and_answer():
+    from datetime import UTC, datetime
+
+    from app.conversation.followup import _retrieval_query
+    from app.generation.prompt import ConversationTurn
+
+    def turn(answer, quality):
+        return ConversationTurn(0, "How often is the key rotated?", answer, [], quality, False,
+                                datetime.now(UTC))
+
+    real = [turn("Every 90 days, with a new key pair.", EvidenceQuality.SUFFICIENT)]
+    assert _retrieval_query("Who receives it?", real) == (
+        "How often is the key rotated? Every 90 days, with a new key pair. Who receives it?"
+    )
+    abstained = [turn("The documents do not contain enough information.",
+                      EvidenceQuality.INSUFFICIENT)]
+    assert _retrieval_query("Who receives it?", abstained) == (
+        "How often is the key rotated? Who receives it?"
+    )
+    assert _retrieval_query("First question", []) == "First question"
+
+
+def test_expanded_follow_up_search_finds_earlier_evidence_by_itself(tmp_path):
+    """With a single candidate slot, the expanded query still ranks the earlier evidence."""
+    llm = CiteLLM(["rotated every 90 days", "rotated every 90 days"])
+    pipeline, _ = _small_candidate_pipeline(tmp_path, llm, max_candidates=1)
+    first = ask(pipeline, "How often must the encryption key be rotated?")
+    follow = ask(pipeline, "Tell me about garbage collection threads", session_id=first.session_id)
+    assert [p.passage_id for p in follow.result.context.passages] == [
+        first.result.answer.citations[0].passage_id
+    ]

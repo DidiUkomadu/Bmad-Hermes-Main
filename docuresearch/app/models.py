@@ -30,6 +30,7 @@ class DocumentMeta:
     uploaded_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     page_count: int | None = None
     section_count: int | None = None
+    owner_id: str | None = None  # user who uploaded it; None for unowned (legacy/eval) data
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -92,7 +93,7 @@ class RawDocument:
             self.full_text = "".join(u["text"] for u in self.units)
 
 
-def generate_document_id(name: str) -> str:
+def generate_document_id(name: str, owner_id: str | None = None) -> str:
     """Generate a stable, deterministic document ID from a name.
 
     Uses an MD5 hash of the filename to produce a stable ID that is
@@ -100,6 +101,10 @@ def generate_document_id(name: str) -> str:
     evaluation dataset's gold passage references stable across runs.
     The ID format is compatible with the UUID4 contract (a short
     hex string) while being deterministic rather than random.
+
+    When *owner_id* is given (uploads by a signed-in user), it is part of the
+    hash, so two users uploading the same filename get different IDs. Without
+    it the ID depends on the filename only, keeping evaluation IDs stable.
     """
     import hashlib
     import re
@@ -110,7 +115,8 @@ def generate_document_id(name: str) -> str:
         slug = "document"
     slug = slug[:40]
     # Deterministic suffix from hash of the filename
-    suffix = hashlib.md5(name.encode("utf-8")).hexdigest()[:8]
+    key = f"{owner_id}:{name}" if owner_id else name
+    suffix = hashlib.md5(key.encode("utf-8")).hexdigest()[:8]
     return f"{slug}-{suffix}"
 
 

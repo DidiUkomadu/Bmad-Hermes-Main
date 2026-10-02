@@ -15,6 +15,8 @@ Environment overrides:
     DOCURESEARCH_LLM_MODEL      llm.model
     DOCURESEARCH_LLM_TIMEOUT    llm.timeout_seconds
     DOCURESEARCH_LLM_API_KEY    (environment only)
+    DOCURESEARCH_ALLOW_REGISTRATION  auth.allow_registration (true/false)
+    DOCURESEARCH_COOKIE_SECURE       auth.cookie_secure (true/false)
 """
 
 from __future__ import annotations
@@ -54,11 +56,18 @@ class Settings:
     semantic_weight: float = 0.5
     keyword_weight: float = 0.5
     max_history_turns: int = 5
+    allow_registration: bool = True
+    session_lifetime_days: int = 7
+    cookie_secure: bool = False  # set True when served over HTTPS
     llm: LLMSettings = field(default_factory=LLMSettings)
 
     def __post_init__(self) -> None:
         if self.max_candidates < 1:
             raise ConfigError(f"retrieval.max_candidates must be >= 1, got {self.max_candidates}")
+        if self.session_lifetime_days < 1:
+            raise ConfigError(
+                f"auth.session_lifetime_days must be >= 1, got {self.session_lifetime_days}"
+            )
         if self.max_history_turns < 1:
             raise ConfigError(
                 f"conversation.max_turns must be >= 1, got {self.max_history_turns}"
@@ -99,6 +108,7 @@ class Settings:
         storage = data.get("storage", {})
         retrieval = data.get("retrieval", {})
         conversation = data.get("conversation", {})
+        auth = data.get("auth", {})
         llm = data.get("llm", {})
 
         db_path = Path(env.get("DOCURESEARCH_DB_PATH") or storage.get("db_path", cls.db_path))
@@ -112,6 +122,16 @@ class Settings:
             semantic_weight=float(retrieval.get("semantic_weight", cls.semantic_weight)),
             keyword_weight=float(retrieval.get("keyword_weight", cls.keyword_weight)),
             max_history_turns=int(conversation.get("max_turns", cls.max_history_turns)),
+            allow_registration=_flag(
+                env.get("DOCURESEARCH_ALLOW_REGISTRATION"),
+                auth.get("allow_registration", cls.allow_registration),
+            ),
+            session_lifetime_days=int(
+                auth.get("session_lifetime_days", cls.session_lifetime_days)
+            ),
+            cookie_secure=_flag(
+                env.get("DOCURESEARCH_COOKIE_SECURE"), auth.get("cookie_secure", cls.cookie_secure)
+            ),
             llm=LLMSettings(
                 base_url=env.get("DOCURESEARCH_LLM_BASE_URL") or llm.get("base_url"),
                 model=env.get("DOCURESEARCH_LLM_MODEL") or llm.get("model"),
@@ -139,3 +159,15 @@ def read_env_file(path: Path) -> dict[str, str]:
             value = value[1:-1]
         values[key.strip().removeprefix("export ").strip()] = value
     return values
+
+
+def _flag(env_value: str | None, default: object) -> bool:
+    """A boolean from an environment string (if set) or a TOML value."""
+    if env_value is None or env_value == "":
+        return bool(default)
+    value = env_value.strip().lower()
+    if value in ("1", "true", "yes", "on"):
+        return True
+    if value in ("0", "false", "no", "off"):
+        return False
+    raise ConfigError(f"Expected true/false, got {env_value!r}")

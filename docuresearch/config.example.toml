@@ -13,8 +13,15 @@ semantic_weight = 0.5
 keyword_weight = 0.5
 
 [conversation]
-# Turns (question + answer pairs) kept per session.
+# Recent turns (question + answer pairs) given to the model as context. All turns are kept.
 max_turns = 5
+
+[auth]
+# Anyone who can reach the server can create an account while this is true.
+allow_registration = true
+session_lifetime_days = 7
+# Set to true when DocuResearch is served over HTTPS.
+cookie_secure = false
 
 [llm]
 # Any OpenAI-compatible /chat/completions endpoint.

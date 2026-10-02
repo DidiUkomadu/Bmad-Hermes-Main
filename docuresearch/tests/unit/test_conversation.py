@@ -14,6 +14,7 @@ from app.conversation import (
     delete_session,
     get_history,
     get_session,
+    list_sessions,
     prune_history,
     set_document_scope,
 )
@@ -122,27 +123,26 @@ def test_turns_returned_in_chronological_order(conn):
     assert history[0].created_at <= history[1].created_at <= history[2].created_at
 
 
-def test_history_limited_to_newest_five_and_oldest_pruned(conn):
+def test_context_history_limited_to_newest_five_but_all_turns_kept(conn):
     session = create_session(conn)
     for i in range(DEFAULT_MAX_TURNS + 2):
         add_turn(conn, session.session_id, f"q{i}", _answer())
 
-    history = get_history(conn, session.session_id, max_turns=100)
     assert DEFAULT_MAX_TURNS == 5
-    assert [t.user_query for t in history] == ["q2", "q3", "q4", "q5", "q6"]
-    stored_rows = conn.execute(
-        "SELECT COUNT(*) FROM conversation_turns WHERE session_id = ?",
-        (session.session_id,),
-    ).fetchone()[0]
-    assert stored_rows == 5  # pruned from storage, not just hidden
+    context = get_history(conn, session.session_id)
+    assert [t.user_query for t in context] == ["q2", "q3", "q4", "q5", "q6"]
+    everything = get_history(conn, session.session_id, max_turns=None)
+    assert [t.user_query for t in everything] == [f"q{i}" for i in range(7)]
 
 
 def test_turn_index_is_not_reused_after_pruning(conn):
     session = create_session(conn)
-    for i in range(7):
-        turn = add_turn(conn, session.session_id, f"q{i}", _answer(), max_turns=2)
-    assert turn.turn_index == 6
-    assert [t.turn_index for t in get_history(conn, session.session_id)] == [5, 6]
+    for i in range(5):
+        add_turn(conn, session.session_id, f"q{i}", _answer())
+    prune_history(conn, session.session_id, max_turns=2)
+    turn = add_turn(conn, session.session_id, "q5", _answer())
+    assert turn.turn_index == 5
+    assert [t.turn_index for t in get_history(conn, session.session_id)] == [3, 4, 5]
 
 
 def test_get_history_max_turns_returns_newest_subset(conn):
@@ -166,9 +166,9 @@ def test_prune_history_with_smaller_limit(conn):
 def test_invalid_max_turns_rejected(conn):
     session = create_session(conn)
     with pytest.raises(ValueError):
-        add_turn(conn, session.session_id, "q", _answer(), max_turns=0)
-    with pytest.raises(ValueError):
         get_history(conn, session.session_id, max_turns=0)
+    with pytest.raises(ValueError):
+        prune_history(conn, session.session_id, max_turns=0)
 
 
 @pytest.mark.parametrize(
@@ -265,3 +265,64 @@ def test_stored_history_feeds_prompt_construction(conn):
     )
     assert "User: How often are keys rotated?" in prompt
     assert "Evidence quality: sufficient" in prompt
+
+
+def test_evidence_narrative_persists(conn):
+    session = create_session(conn)
+    answer = GeneratedAnswer(
+        answer_text="a", citations=[], evidence_quality=EvidenceQuality.PARTIAL,
+        evidence_quality_narrative="Supported: rotation. Not stated: interval.",
+        is_abstention=False, generation_latency_seconds=0.0,
+    )
+    add_turn(conn, session.session_id, "q", answer)
+    [turn] = get_history(conn, session.session_id)
+    assert turn.evidence_quality_narrative == "Supported: rotation. Not stated: interval."
+
+
+def test_list_sessions_titled_by_first_question_newest_first(conn):
+    older = create_session(conn)
+    add_turn(conn, older.session_id, "How often are keys rotated?", _answer())
+    add_turn(conn, older.session_id, "Who receives the key?", _answer())
+    newer = create_session(conn)
+    add_turn(conn, newer.session_id, "What is Omega?", _answer())
+    create_session(conn)  # never used: not listed
+
+    sessions = list_sessions(conn)
+    assert [s.session_id for s in sessions] == [newer.session_id, older.session_id]
+    assert sessions[1].title == "How often are keys rotated?"
+    assert sessions[1].turn_count == 2
+    assert sessions[0].last_activity >= sessions[1].last_activity
+
+
+def test_schema_migration_adds_narrative_column_to_old_databases(tmp_path):
+    import sqlite3
+
+    path = tmp_path / "old.db"
+    old = sqlite3.connect(path)
+    old.executescript("""
+        CREATE TABLE conversations (session_id TEXT PRIMARY KEY, created_at TEXT NOT NULL,
+                                    current_document_scope TEXT);
+        CREATE TABLE conversation_turns (
+            id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT NOT NULL,
+            turn_index INTEGER NOT NULL, user_query TEXT NOT NULL, answer_text TEXT NOT NULL,
+            citations TEXT NOT NULL, evidence_quality TEXT NOT NULL,
+            is_abstention INTEGER NOT NULL, created_at TEXT NOT NULL);
+        INSERT INTO conversations VALUES ('s1', '2026-09-01T10:00:00+00:00', NULL);
+        INSERT INTO conversation_turns (session_id, turn_index, user_query, answer_text,
+            citations, evidence_quality, is_abstention, created_at)
+            VALUES ('s1', 0, 'old question', 'old answer', '[]', 'sufficient', 0,
+                    '2026-09-01T10:00:00+00:00');
+    """)
+    old.commit()
+    old.close()
+
+    set_db_path(str(path))
+    c = get_connection()
+    try:
+        create_schema(c)
+        create_schema(c)  # idempotent
+        [turn] = get_history(c, "s1")
+        assert turn.user_query == "old question"
+        assert turn.evidence_quality_narrative == ""
+    finally:
+        c.close()

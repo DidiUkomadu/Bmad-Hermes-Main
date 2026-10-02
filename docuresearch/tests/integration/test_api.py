@@ -17,10 +17,16 @@ from pypdf import PdfWriter
 from app.config import LLMSettings, Settings
 from app.main import create_app
 from app.pipeline import ResearchPipeline
-from tests.integration.fakes import DOCS, CiteLLM, HashEmbedding, ScriptedLLM
+from tests.integration.fakes import DOCS, CiteLLM, HashEmbedding, ScriptedLLM, sign_up
 
 API = "/api/v1"
-Q001_GOLD = "sample-spec-pdf-d58d38e8:page:1:chunk:0"  # evaluation dataset, q-001
+Q001_LOCATION = "page:1:chunk:0"  # where evaluation question q-001's answer lives
+MD_SECURITY = "Sample Technical Document / Security Requirements:chunk:1"
+
+
+def _pid(document_id: str, location: str) -> str:
+    """Passage ID for a location in an uploaded document (IDs are owner-scoped)."""
+    return f"{document_id}:{location}"
 
 
 @pytest.fixture
@@ -35,6 +41,7 @@ def make_client(tmp_path):
         client = TestClient(create_app(Settings(db_path=tmp_path / "api.db"), pipeline))
         client.__enter__()
         clients.append(client)
+        sign_up(client)
         return client
 
     yield make
@@ -97,8 +104,9 @@ def test_upload_with_display_name(make_client):
     client = make_client()
     body = _upload(client, "sample_spec.pdf", name="Alpha Protocol Spec").json()
     assert body["name"] == "Alpha Protocol Spec"
-    assert body["document_id"] == "sample-spec-pdf-d58d38e8"  # IDs still from filename
-    passage = client.get(f"{API}/citations/{quote(Q001_GOLD)}").json()
+    assert body["document_id"].startswith("sample-spec-pdf-")  # IDs still from filename
+    pid = _pid(body["document_id"], Q001_LOCATION)
+    passage = client.get(f"{API}/citations/{quote(pid)}").json()
     assert passage["document_name"] == "Alpha Protocol Spec"
 
 
@@ -145,12 +153,13 @@ def test_duplicate_upload_conflicts(make_client):
 
 def test_citation_lookup_returns_stored_text(make_client):
     client = make_client()
-    _upload(client, "sample_spec.pdf")
-    resp = client.get(f"{API}/citations/{quote(Q001_GOLD)}")
+    doc_id = _upload(client, "sample_spec.pdf").json()["document_id"]
+    pid = _pid(doc_id, Q001_LOCATION)
+    resp = client.get(f"{API}/citations/{quote(pid)}")
     assert resp.status_code == 200
     body = resp.json()
-    assert body["passage_id"] == Q001_GOLD
-    assert body["document_id"] == "sample-spec-pdf-d58d38e8"
+    assert body["passage_id"] == pid
+    assert body["document_id"] == doc_id
     assert body["document_name"] == "sample_spec.pdf"
     assert body["location"].startswith("page:1:")  # location carries the chunk suffix
     assert "AES-256" in body["text"]
@@ -159,8 +168,8 @@ def test_citation_lookup_returns_stored_text(make_client):
 
 def test_citation_lookup_handles_ids_with_slashes_and_spaces(make_client):
     client = make_client()
-    _upload(client, "sample_spec.md")
-    pid = "sample-spec-md-b0f9ddb6:Sample Technical Document / Security Requirements:chunk:1"
+    doc_id = _upload(client, "sample_spec.md").json()["document_id"]
+    pid = _pid(doc_id, MD_SECURITY)
     resp = client.get(f"{API}/citations/{quote(pid)}")
     assert resp.status_code == 200, resp.text
     assert resp.json()["passage_id"] == pid
@@ -185,8 +194,9 @@ def test_remove_document_leaves_others(make_client):
 
     listed = client.get(f"{API}/documents").json()["documents"]
     assert [d["document_id"] for d in listed] == [txt["document_id"]]
-    _assert_error(client.get(f"{API}/citations/{quote(Q001_GOLD)}"), 404, "Passage not found")
-    other = "sample-document-txt-27c030ba:paragraph:5:chunk:4"
+    removed = _pid(pdf["document_id"], Q001_LOCATION)
+    _assert_error(client.get(f"{API}/citations/{quote(removed)}"), 404, "Passage not found")
+    other = _pid(txt["document_id"], "paragraph:5:chunk:4")
     assert client.get(f"{API}/citations/{quote(other)}").status_code == 200
 
 
@@ -202,7 +212,7 @@ def test_remove_unknown_document(make_client):
 def test_query_single_source_answer_matches_gold_and_resolves(make_client):
     """Evaluation question q-001, end to end: upload, query, look up the citation."""
     client = make_client(CiteLLM(["AES-256"]))
-    _upload(client, "sample_spec.pdf")
+    doc_id = _upload(client, "sample_spec.pdf").json()["document_id"]
 
     resp = client.post(f"{API}/query", json={
         "question": "What encryption algorithm must be used for data transmissions "
@@ -215,7 +225,7 @@ def test_query_single_source_answer_matches_gold_and_resolves(make_client):
     assert answer["evidence_quality"] == "sufficient"
     assert answer["is_abstention"] is False
     [citation] = answer["citations"]
-    assert citation["passage_id"] == Q001_GOLD
+    assert citation["passage_id"] == _pid(doc_id, Q001_LOCATION)
     assert citation["location"].startswith("page:1:")
     for key in ("retrieval_latency_seconds", "generation_latency_seconds",
                 "total_latency_seconds"):
@@ -280,7 +290,10 @@ def test_query_generation_failure_returns_502(make_client):
 def test_query_without_llm_configured_returns_503(tmp_path):
     settings = Settings(db_path=tmp_path / "x.db", llm=LLMSettings())
     with TestClient(create_app(settings)) as client:
-        assert client.get(f"{API}/health").json() == {"status": "ok", "llm_configured": False}
+        assert client.get(f"{API}/health").json() == {
+            "status": "ok", "llm_configured": False, "registration_open": True,
+        }
+        sign_up(client)
         _assert_error(client.post(f"{API}/query", json={"question": "q"}), 503,
                       "LLM backend not configured")
         assert client.get(f"{API}/documents").status_code == 200  # rest still works
@@ -338,14 +351,15 @@ def test_start_conversation_without_body(make_client):
 # ---------------------------------------------------------------------------
 
 
-def test_openapi_matches_contract_and_has_no_auth_or_confidence(make_client):
+def test_openapi_matches_contract_and_has_no_confidence(make_client):
     spec = make_client().get("/openapi.json").json()
     assert set(spec["paths"]) == {
+        f"{API}/auth/register", f"{API}/auth/login", f"{API}/auth/logout", f"{API}/auth/me",
         f"{API}/documents/upload", f"{API}/documents", f"{API}/documents/{{document_id}}",
-        f"{API}/query", f"{API}/conversation", f"{API}/conversation/{{session_id}}/follow-up",
+        f"{API}/query", f"{API}/conversation", f"{API}/conversation/{{session_id}}",
+        f"{API}/conversation/{{session_id}}/follow-up",
         f"{API}/citations/{{passage_id}}", f"{API}/health",
     }
-    assert "securitySchemes" not in spec.get("components", {})
     assert "confidence" not in json.dumps(spec).lower()
 
 
@@ -372,12 +386,12 @@ def test_concurrent_requests_do_not_share_connections_across_threads(make_client
     from concurrent.futures import ThreadPoolExecutor
 
     client = make_client()
-    _upload(client, "sample_spec.md")
-    _upload(client, "sample_document.txt")
+    md = _upload(client, "sample_spec.md").json()["document_id"]
+    txt = _upload(client, "sample_document.txt").json()["document_id"]
     ids = [
-        "sample-spec-md-b0f9ddb6:Sample Technical Document:chunk:0",
-        "sample-document-txt-27c030ba:paragraph:5:chunk:4",
-        Q001_GOLD,  # not uploaded here: 404 is fine, 500 is not
+        _pid(md, "Sample Technical Document:chunk:0"),
+        _pid(txt, "paragraph:5:chunk:4"),
+        "never-uploaded:page:1:chunk:0",  # 404 is fine, 500 is not
     ]
 
     def lookup(i):
@@ -387,3 +401,77 @@ def test_concurrent_requests_do_not_share_connections_across_threads(make_client
         statuses = list(pool.map(lookup, range(60)))
     assert set(statuses) <= {200, 404}, statuses
     assert statuses.count(200) == 40
+
+
+
+# ---------------------------------------------------------------------------
+# Reopening conversations
+# ---------------------------------------------------------------------------
+
+
+def _ask_in(client, session_id, question):
+    resp = client.post(f"{API}/query", json={"question": question, "session_id": session_id})
+    assert resp.status_code == 200, resp.text
+    return resp.json()["answer"]
+
+
+def test_conversations_can_be_listed_and_reopened_in_full(make_client):
+    client = make_client(CiteLLM(["rotated every 90 days"] * 7 + ["garbage collector"]))
+    _upload(client, "sample_spec.md")
+    _upload(client, "sample_document.txt")
+
+    first = client.post(f"{API}/conversation").json()["session_id"]
+    answers = [_ask_in(client, first, f"Key rotation question {i}?") for i in range(7)]
+    second = client.post(f"{API}/conversation").json()["session_id"]
+    _ask_in(client, second, "How is memory managed?")
+    client.post(f"{API}/conversation")  # empty session: not listed
+
+    listed = client.get(f"{API}/conversation").json()["sessions"]
+    assert [s["session_id"] for s in listed] == [second, first]
+    assert listed[1]["title"] == "Key rotation question 0?"
+    assert listed[1]["turn_count"] == 7
+
+    detail = client.get(f"{API}/conversation/{first}").json()
+    assert detail["session_id"] == first
+    assert [t["question"] for t in detail["turns"]] == [f"Key rotation question {i}?"
+                                                        for i in range(7)]  # all 7, not 5
+    stored = detail["turns"][0]["answer"]
+    assert stored["answer_text"] == answers[0]["answer_text"]
+    assert stored["citations"] == answers[0]["citations"]  # incl. location_label, excerpt
+    assert stored["evidence_quality_narrative"] == answers[0]["evidence_quality_narrative"]
+    assert detail["document_scope"] == {"mode": "all", "document_id": None}
+
+
+def test_reopened_conversation_continues_with_its_context(make_client):
+    llm = CiteLLM(["rotated every 90 days", "garbage collector", "public key"])
+    client = make_client(llm)
+    _upload(client, "sample_spec.md")
+    _upload(client, "sample_document.txt")
+
+    first = client.post(f"{API}/conversation").json()["session_id"]
+    _ask_in(client, first, "How often must the encryption key be rotated?")
+    other = client.post(f"{API}/conversation").json()["session_id"]
+    _ask_in(client, other, "How is memory managed?")
+
+    # Reopen the first conversation and follow up: its own history is the context.
+    client.get(f"{API}/conversation/{first}")
+    resp = client.post(f"{API}/conversation/{first}/follow-up",
+                       json={"question": "What must be distributed after each one?"})
+    assert resp.status_code == 200, resp.text
+    prompt = llm.prompts[-1]
+    assert "User: How often must the encryption key be rotated?" in prompt
+    assert "How is memory managed?" not in prompt
+    assert "public key" in resp.json()["answer"]["citations"][0]["excerpt"]
+
+
+def test_delete_conversation(make_client):
+    client = make_client(CiteLLM(["AES-256"]))
+    _upload(client, "sample_spec.md")
+    session_id = client.post(f"{API}/conversation").json()["session_id"]
+    _ask_in(client, session_id, "What encryption?")
+
+    resp = client.delete(f"{API}/conversation/{session_id}")
+    assert resp.json() == {"session_id": session_id, "status": "removed"}
+    assert client.get(f"{API}/conversation").json()["sessions"] == []
+    _assert_error(client.get(f"{API}/conversation/{session_id}"), 404, "Session not found")
+    _assert_error(client.delete(f"{API}/conversation/{session_id}"), 404, "Session not found")

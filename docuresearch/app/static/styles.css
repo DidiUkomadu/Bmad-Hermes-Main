@@ -241,3 +241,44 @@ button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-
 .ask-controls select { width: auto; flex: 1 1 12rem; }
 .ask-actions { display: flex; gap: 0.75rem; align-items: center; justify-content: space-between; margin-top: 0.5rem; }
 .ask-actions .message { margin: 0; }
+
+/* Conversations ----------------------------------------------------------- */
+
+.sessions { margin-top: 1.5rem; }
+.session-list { list-style: none; margin: 0; padding: 0; }
+.session {
+  display: flex; align-items: center; gap: 0.25rem;
+  border-top: 1px solid var(--border);
+}
+.session-open {
+  flex: 1; min-width: 0; text-align: left;
+  background: none; border: none; color: var(--text);
+  padding: 0.5rem 0.35rem; border-radius: 6px;
+}
+.session-open:hover { background: var(--quote-bg); }
+.session.active .session-open { background: var(--quote-bg); box-shadow: inset 3px 0 0 var(--accent); }
+.session-title {
+  display: block; font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.session-meta { display: block; font-size: 0.78rem; color: var(--muted); }
+
+/* Accounts ---------------------------------------------------------------- */
+
+.account { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; }
+.account-user { margin: 0; display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; }
+#account-name { font-weight: 600; }
+.account-user button { padding: 0.3rem 0.7rem; font-size: 0.85rem; }
+
+.auth { display: flex; justify-content: center; padding: 3rem 1rem; }
+.auth-card { width: 100%; max-width: 24rem; padding: 1.5rem; }
+.auth-card h2 { font-size: 1.2rem; }
+.auth-intro { margin: 0.4rem 0 0.75rem; color: var(--muted); font-size: 0.9rem; }
+.auth-card input { width: 100%; }
+.auth-card button[type="submit"] { width: 100%; margin-top: 1rem; }
+.hint-text { margin: 0.3rem 0 0; font-size: 0.8rem; color: var(--muted); }
+.auth-switch { margin: 1rem 0 0; font-size: 0.9rem; color: var(--muted); text-align: center; }
+input[type="email"], input[type="password"] {
+  font: inherit; color: inherit; background: var(--bg);
+  border: 1px solid var(--border); border-radius: 6px; padding: 0.45rem 0.55rem;
+}

@@ -5,6 +5,10 @@ Run locally (from the docuresearch/ directory):
 
 then open http://localhost:8000 for the UI (Epic 6) or /docs for the API.
 
+Every endpoint except health, sign-in/registration, and the UI itself requires
+a signed-in user, and each user only ever sees their own documents and
+conversations (Epic 8).
+
 The app starts without an LLM configured: document upload, listing, removal,
 and citation lookup work; question endpoints return 503 until
 DOCURESEARCH_LLM_BASE_URL and DOCURESEARCH_LLM_MODEL are set.
@@ -21,7 +25,7 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from app.api import citations, documents, query
+from app.api import auth, citations, documents, query
 from app.api.deps import AppState
 from app.api.errors import register_error_handlers
 from app.config import Settings
@@ -109,13 +113,17 @@ def create_app(
         lifespan=lifespan,
     )
     register_error_handlers(app)
-    for module in (documents, query, citations):
+    for module in (auth, documents, query, citations):
         app.include_router(module.router, prefix=API_PREFIX)
 
     @app.get(f"{API_PREFIX}/health", tags=["health"])
     def health() -> dict[str, object]:
         state: AppState = app.state.docuresearch
-        return {"status": "ok", "llm_configured": state.llm_unavailable_reason is None}
+        return {
+            "status": "ok",
+            "llm_configured": state.llm_unavailable_reason is None,
+            "registration_open": state.settings.allow_registration,
+        }
 
     # Citation UI (Epic 6): plain HTML + JS, no build step (implementation plan §14.8).
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")

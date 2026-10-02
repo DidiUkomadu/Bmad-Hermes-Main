@@ -122,6 +122,47 @@ class SessionCreateResponse(BaseModel):
     created_at: datetime
 
 
+class SessionSummaryModel(BaseModel):
+    session_id: str
+    title: str  # the conversation's first question
+    turn_count: int
+    created_at: datetime
+    last_activity: datetime
+
+
+class SessionListResponse(BaseModel):
+    sessions: list[SessionSummaryModel]
+
+
+class StoredAnswerModel(BaseModel):
+    """An answer as recorded in a conversation (latencies are not stored)."""
+
+    answer_text: str
+    citations: list[CitationModel]
+    evidence_quality: EvidenceQualityValue
+    evidence_quality_narrative: str
+    is_abstention: bool
+
+
+class TurnModel(BaseModel):
+    turn_index: int
+    question: str
+    answer: StoredAnswerModel
+    created_at: datetime
+
+
+class SessionDetailResponse(BaseModel):
+    session_id: str
+    created_at: datetime
+    document_scope: DocumentScopeModel | None
+    turns: list[TurnModel]
+
+
+class SessionRemovalResponse(BaseModel):
+    session_id: str
+    status: Literal["removed"] = "removed"
+
+
 # ---------------------------------------------------------------------------
 # Citations (§5.5)
 # ---------------------------------------------------------------------------
@@ -136,3 +177,26 @@ class PassageResponse(BaseModel):
     text: str
     start_offset: int
     end_offset: int
+
+
+# ---------------------------------------------------------------------------
+# Accounts (Epic 8)
+# ---------------------------------------------------------------------------
+
+
+class RegisterRequest(BaseModel):
+    email: str = Field(min_length=3, max_length=254)
+    password: str = Field(min_length=1, max_length=1024)
+    display_name: str | None = Field(default=None, max_length=200)
+
+
+class LoginRequest(BaseModel):
+    email: str = Field(min_length=1, max_length=254)
+    password: str = Field(min_length=1, max_length=1024)
+
+
+class UserResponse(BaseModel):
+    id: str
+    email: str
+    display_name: str
+    created_at: datetime

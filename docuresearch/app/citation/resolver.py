@@ -52,13 +52,19 @@ class ResolvedPassage:
         return format_location(self.location)
 
 
-def resolve_passage(conn: sqlite3.Connection, passage_id: str) -> ResolvedPassage | None:
-    """Return the stored passage and its document name, or None if unknown."""
+def resolve_passage(
+    conn: sqlite3.Connection, passage_id: str, owner_id: str | None = None
+) -> ResolvedPassage | None:
+    """Return the stored passage and its document name, or None if unknown.
+
+    With *owner_id*, passages of other users' documents are treated as unknown.
+    """
+    clause, args = ("", ()) if owner_id is None else (" AND d.owner_id = ?", (owner_id,))
     row = conn.execute(
         "SELECT p.id, p.document_id, d.name AS document_name, p.location, p.text, "
         "p.start_offset, p.end_offset "
-        "FROM passages p JOIN documents d ON p.document_id = d.id WHERE p.id = ?",
-        (passage_id,),
+        f"FROM passages p JOIN documents d ON p.document_id = d.id WHERE p.id = ?{clause}",
+        (passage_id, *args),
     ).fetchone()
     if row is None:
         return None

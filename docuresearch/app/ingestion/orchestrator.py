@@ -15,7 +15,7 @@ from app.chunking.strategy import ChunkingConfig, chunk_passages
 from app.ingestion.markdown import parse_markdown
 from app.ingestion.pdf import extract_text_from_pdf
 from app.ingestion.text import parse_plain_text
-from app.models import DocumentFormat, DocumentMeta, RawDocument
+from app.models import DocumentFormat, DocumentMeta, RawDocument, generate_document_id
 from app.retrieval.interface import EmbeddingModel
 from app.store.schema import (
     create_document,
@@ -135,6 +135,7 @@ def ingest_document(
     db_path: str | None = None,
     chunking_config: ChunkingConfig | None = None,
     embedding_model: EmbeddingModel | None = None,
+    owner_id: str | None = None,
 ) -> dict[str, Any]:
     """Ingest a document: detect format, parse, chunk, and persist.
 
@@ -151,6 +152,8 @@ def ingest_document(
             passage is embedded before persistence so it is available to
             semantic retrieval. When None, passages are stored without
             embeddings (keyword retrieval only).
+        owner_id: The user uploading the document. The document is stored as
+            theirs, with an owner-scoped ID. None for unowned (internal) use.
 
     Returns:
         A dict with:
@@ -175,6 +178,7 @@ def ingest_document(
         db_path=db_path,
         chunking_config=chunking_config,
         embedding_model=embedding_model,
+        owner_id=owner_id,
     )
 
 
@@ -184,6 +188,7 @@ def ingest_document_bytes(
     db_path: str | None = None,
     chunking_config: ChunkingConfig | None = None,
     embedding_model: EmbeddingModel | None = None,
+    owner_id: str | None = None,
 ) -> dict[str, Any]:
     """Ingest a document from raw bytes with a given filename.
 
@@ -198,6 +203,7 @@ def ingest_document_bytes(
         db_path: Optional path to the SQLite database.
         chunking_config: Optional chunking configuration.
         embedding_model: Optional embedding model (see ingest_document).
+        owner_id: The uploading user (see ingest_document).
 
     Returns:
         Same structure as ingest_document().
@@ -208,6 +214,7 @@ def ingest_document_bytes(
         db_path=db_path,
         chunking_config=chunking_config,
         embedding_model=embedding_model,
+        owner_id=owner_id,
     )
 
 
@@ -217,6 +224,7 @@ def _ingest(
     db_path: str | None,
     chunking_config: ChunkingConfig | None,
     embedding_model: EmbeddingModel | None,
+    owner_id: str | None = None,
 ) -> dict[str, Any]:
     """Shared ingestion path for file and byte sources."""
     # 1. Detect format
@@ -225,6 +233,10 @@ def _ingest(
 
     # 2. Ingest with the appropriate handler
     raw = _HANDLERS[fmt](file_bytes, name)
+    if owner_id is not None:
+        # Owner-scoped IDs (change proposal D6); must be set before chunking,
+        # which derives passage IDs from the document ID.
+        raw.document_id = generate_document_id(name, owner_id)
 
     # 3. Chunk
     config = chunking_config if chunking_config is not None else ChunkingConfig()
@@ -272,6 +284,7 @@ def _ingest(
                 format=raw.format,
                 uploaded_at=raw.uploaded_at,
                 page_count=page_count,
+                owner_id=owner_id,
             ),
         )
         passage_ids: list[str] = []

@@ -15,8 +15,8 @@
 - **Linting/formatting:** Ruff
 
 ## Scope (MVP)
-- **Single-user** focus on core research workflow
-- **Excluded from MVP:** Authentication, billing, multi-tenancy, enterprise administration
+- **Multi-user with private libraries** (changed 2026-10-02, see `_bmad-output/planning-artifacts/docuresearch-change-proposal-multi-user.md`): users sign in with email and password; each user's documents and conversations are visible only to them.
+- **Excluded from MVP:** Billing, enterprise administration, roles and permissions, shared workspaces, OAuth / single sign-on, email-based password reset
 
 ## Deployment
 - **Local-first** for MVP; deployment comes later
@@ -28,3 +28,4 @@
 
 ## Critical Pitfalls (Agents Must Know)
 - **Hallucinations / ungrounded answers are a MAJOR concern.** Every answer must be grounded in source material. Citation accuracy and source-grounding take priority over fluency. Agents should flag uncertainty rather than fabricate.
+- **Data isolation between users is mandatory.** Every API path must pass the signed-in user's ID as `owner_id` to the store, retrieval, citation and conversation functions. `owner_id=None` means "unfiltered" and is only for trusted internal callers (the evaluation runner). A user must never see, retrieve, or be answered from another user's documents. `tests/integration/test_multi_user.py` guards this.

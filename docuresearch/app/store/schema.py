@@ -11,6 +11,14 @@ Tables:
     conversation_turns — session_id (FK, cascade), turn_index, user_query, answer_text,
                          citations (JSON), evidence_quality, is_abstention, created_at
                          (managed by app.conversation.session, Story 5.1)
+    users              — id, email (unique, case-insensitive), display_name,
+                         password_hash, created_at (Epic 8)
+    auth_sessions      — token_hash, user_id (FK, cascade), created_at, expires_at
+
+Ownership (Epic 8): documents and conversations carry an ``owner_id``. Repository
+functions take an optional ``owner_id``; when given, only that owner's rows are
+visible. ``None`` means unfiltered, used only by trusted internal callers such
+as the evaluation runner, never by the API.
 """
 
 from __future__ import annotations
@@ -112,11 +120,50 @@ def create_schema(conn: sqlite3.Connection) -> None:
             ),
             is_abstention INTEGER NOT NULL CHECK (is_abstention IN (0, 1)),
             created_at TEXT NOT NULL,
+            evidence_quality_narrative TEXT NOT NULL DEFAULT '',
             UNIQUE(session_id, turn_index)
         )
     """)
+    _add_column_if_missing(
+        conn, "conversation_turns", "evidence_quality_narrative", "TEXT NOT NULL DEFAULT ''"
+    )
+
+    # Accounts and sign-in sessions (Epic 8)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id TEXT PRIMARY KEY,
+            email TEXT NOT NULL UNIQUE COLLATE NOCASE,
+            display_name TEXT NOT NULL,
+            password_hash TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS auth_sessions (
+            token_hash TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            created_at TEXT NOT NULL,
+            expires_at TEXT NOT NULL
+        )
+    """)
+
+    # Ownership; NULL for data created before accounts existed (adopted by the
+    # first registered user, see app.auth.service).
+    _add_column_if_missing(conn, "documents", "owner_id", "TEXT")
+    _add_column_if_missing(conn, "conversations", "owner_id", "TEXT")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_documents_owner ON documents(owner_id)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_conversations_owner ON conversations(owner_id)")
 
     conn.commit()
+
+
+def _add_column_if_missing(
+    conn: sqlite3.Connection, table: str, column: str, definition: str
+) -> None:
+    """Minimal migration for databases created before a column existed."""
+    columns = {row[1] for row in conn.execute(f"PRAGMA table_info({table})")}  # 1 = name
+    if column not in columns:
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
 
 
 # ---------------------------------------------------------------------------
@@ -126,8 +173,9 @@ def create_schema(conn: sqlite3.Connection) -> None:
 def create_document(conn: sqlite3.Connection, doc: DocumentMeta) -> DocumentMeta:
     """Insert a document record and return it."""
     conn.execute(
-        """INSERT INTO documents (id, name, format, uploaded_at, page_count, section_count)
-           VALUES (?, ?, ?, ?, ?, ?)""",
+        """INSERT INTO documents
+               (id, name, format, uploaded_at, page_count, section_count, owner_id)
+           VALUES (?, ?, ?, ?, ?, ?, ?)""",
         (
             doc.id,
             doc.name,
@@ -135,26 +183,38 @@ def create_document(conn: sqlite3.Connection, doc: DocumentMeta) -> DocumentMeta
             doc.uploaded_at.isoformat(),
             doc.page_count,
             doc.section_count,
+            doc.owner_id,
         ),
     )
     conn.commit()
     return doc
 
 
-def get_document(conn: sqlite3.Connection, doc_id: str) -> DocumentMeta | None:
-    """Retrieve a document by ID, or None if not found."""
+def _owner_clause(owner_id: str | None) -> tuple[str, tuple[str, ...]]:
+    """SQL fragment restricting documents to an owner (no restriction for None)."""
+    return ("", ()) if owner_id is None else (" AND owner_id = ?", (owner_id,))
+
+
+def get_document(
+    conn: sqlite3.Connection, doc_id: str, owner_id: str | None = None
+) -> DocumentMeta | None:
+    """Retrieve a document by ID, or None if not found (or not owned by *owner_id*)."""
+    clause, args = _owner_clause(owner_id)
     row = conn.execute(
-        "SELECT * FROM documents WHERE id = ?", (doc_id,)
+        f"SELECT * FROM documents WHERE id = ?{clause}", (doc_id, *args)
     ).fetchone()
     if row is None:
         return None
     return _row_to_document(row)
 
 
-def list_documents(conn: sqlite3.Connection) -> list[DocumentMeta]:
-    """List all documents ordered by upload time ( newest first )."""
+def list_documents(
+    conn: sqlite3.Connection, owner_id: str | None = None
+) -> list[DocumentMeta]:
+    """List documents (only *owner_id*'s when given), newest first."""
+    clause, args = _owner_clause(owner_id)
     rows = conn.execute(
-        "SELECT * FROM documents ORDER BY uploaded_at DESC"
+        f"SELECT * FROM documents WHERE 1 = 1{clause} ORDER BY uploaded_at DESC", args
     ).fetchall()
     return [_row_to_document(r) for r in rows]
 
@@ -205,20 +265,29 @@ def list_passages_for_document(
     return [_row_to_passage(r) for r in rows]
 
 
-def rename_document(conn: sqlite3.Connection, doc_id: str, name: str) -> bool:
+def rename_document(
+    conn: sqlite3.Connection, doc_id: str, name: str, owner_id: str | None = None
+) -> bool:
     """Set a document's user-visible name. Returns False if it does not exist."""
-    cur = conn.execute("UPDATE documents SET name = ? WHERE id = ?", (name, doc_id))
+    clause, args = _owner_clause(owner_id)
+    cur = conn.execute(
+        f"UPDATE documents SET name = ? WHERE id = ?{clause}", (name, doc_id, *args)
+    )
     conn.commit()
     return cur.rowcount > 0
 
 
-def delete_document(conn: sqlite3.Connection, doc_id: str) -> bool:
+def delete_document(
+    conn: sqlite3.Connection, doc_id: str, owner_id: str | None = None
+) -> bool:
     """Delete a document and all its passages (CASCADE).
 
-    Returns True if a document was deleted, False if the document didn't exist.
+    Returns True if a document was deleted, False if the document didn't exist
+    (or is not owned by *owner_id*).
     """
     # DELETE on documents triggers CASCADE on passages (ON DELETE CASCADE)
-    cur = conn.execute("DELETE FROM documents WHERE id = ?", (doc_id,))
+    clause, args = _owner_clause(owner_id)
+    cur = conn.execute(f"DELETE FROM documents WHERE id = ?{clause}", (doc_id, *args))
     conn.commit()
     return cur.rowcount > 0
 
@@ -232,6 +301,7 @@ def _row_to_document(row: sqlite3.Row) -> DocumentMeta:
         uploaded_at=_parse_dt(row["uploaded_at"]),
         page_count=row["page_count"],
         section_count=row["section_count"],
+        owner_id=row["owner_id"] if "owner_id" in row.keys() else None,
     )
 
 

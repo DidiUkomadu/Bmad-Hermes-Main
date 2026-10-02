@@ -8,6 +8,14 @@
 // Multi-document answers (story 6.2): every reference shows its document name,
 // and each document gets its own colour within an answer.
 //
+// Conversations: every conversation is listed in the sidebar and can be
+// reopened with all its turns; follow-ups then continue in that session. The
+// open conversation is remembered across page reloads (localStorage, per user).
+//
+// Accounts (Epic 8): signed-out visitors see the sign-in screen. The session
+// lives in an HttpOnly cookie this script cannot read; any 401 from the API
+// returns to the sign-in screen and clears the previous user's data from view.
+//
 // All model- and document-derived text is inserted with textContent, never as
 // HTML, so document content cannot inject markup or scripts.
 "use strict";
@@ -15,9 +23,35 @@
 const API = "/api/v1";
 
 const state = {
+  user: null,
   sessionId: null,
   documents: [],
+  sessions: [],
+  registering: false,
+  registrationOpen: true,
 };
+
+function sessionKey() {
+  return `docuresearch.sessionId.${state.user ? state.user.id : "anonymous"}`;
+}
+
+function rememberSession(sessionId) {
+  state.sessionId = sessionId;
+  try {
+    if (sessionId) localStorage.setItem(sessionKey(), sessionId);
+    else localStorage.removeItem(sessionKey());
+  } catch {
+    // Storage unavailable (private mode): the session still works for this page.
+  }
+}
+
+function savedSession() {
+  try {
+    return localStorage.getItem(sessionKey());
+  } catch {
+    return null;
+  }
+}
 
 const QUALITY_LABELS = {
   sufficient: "Supported by the documents",
@@ -55,6 +89,7 @@ async function api(path, options = {}) {
   if (!resp.ok) {
     const summary = body && body.error ? body.error : `Request failed (${resp.status})`;
     const detail = body && body.detail ? `: ${body.detail}` : "";
+    if (resp.status === 401 && !path.startsWith("/auth/")) showSignIn("Your session has ended. Please sign in again.");
     throw new Error(summary + detail);
   }
   return body;
@@ -68,6 +103,12 @@ function setMessage(id, text, isError = false) {
 
 function formatSeconds(seconds) {
   return `${seconds.toFixed(1)} s`;
+}
+
+function formatWhen(iso) {
+  return new Date(iso).toLocaleString(undefined, {
+    month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -174,7 +215,7 @@ async function askQuestion(event) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ initial_document_scope: scope }),
       });
-      state.sessionId = session.session_id;
+      rememberSession(session.session_id);
     }
     const result = await api("/query", {
       method: "POST",
@@ -184,6 +225,7 @@ async function askQuestion(event) {
     appendTurn(question, result.answer);
     textarea.value = "";
     setMessage("ask-message", "");
+    await loadSessions();
   } catch (err) {
     setMessage("ask-message", err.message, true);
   } finally {
@@ -192,14 +234,20 @@ async function askQuestion(event) {
   }
 }
 
-function newConversation() {
-  state.sessionId = null;
+function clearThread() {
   document.getElementById("thread").replaceChildren();
   document.getElementById("thread-empty").hidden = false;
-  setMessage("ask-message", "Started a new conversation.");
 }
 
-function appendTurn(question, answer) {
+function newConversation() {
+  rememberSession(null);
+  clearThread();
+  renderSessions();
+  setMessage("ask-message", "Started a new conversation.");
+  document.getElementById("question").focus();
+}
+
+function appendTurn(question, answer, { scroll = true } = {}) {
   document.getElementById("thread-empty").hidden = true;
   const thread = document.getElementById("thread");
   const item = el("li", { class: "turn" },
@@ -207,7 +255,81 @@ function appendTurn(question, answer) {
     renderAnswer(answer),
   );
   thread.append(item);
-  item.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (scroll) item.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// ---------------------------------------------------------------------------
+// Conversations
+// ---------------------------------------------------------------------------
+
+async function loadSessions() {
+  const { sessions } = await api("/conversation");
+  state.sessions = sessions;
+  renderSessions();
+}
+
+function renderSessions() {
+  const list = document.getElementById("session-list");
+  list.replaceChildren();
+  document.getElementById("session-empty").hidden = state.sessions.length > 0;
+
+  for (const session of state.sessions) {
+    const active = session.session_id === state.sessionId;
+    const count = `${session.turn_count} question${session.turn_count === 1 ? "" : "s"}`;
+    list.append(
+      el("li", { class: active ? "session active" : "session" },
+        el("button", {
+          type: "button",
+          class: "session-open",
+          "aria-current": active ? "true" : "false",
+          title: session.title,
+          onclick: () => openSession(session.session_id),
+        },
+        el("span", { class: "session-title", text: session.title }),
+        el("span", { class: "session-meta", text: `${count} · ${formatWhen(session.last_activity)}` }),
+        ),
+        el("button", {
+          type: "button",
+          class: "link danger",
+          "aria-label": `Delete conversation: ${session.title}`,
+          text: "Delete",
+          onclick: () => deleteSession(session),
+        }),
+      ),
+    );
+  }
+}
+
+async function openSession(sessionId) {
+  try {
+    const session = await api(`/conversation/${encodeURIComponent(sessionId)}`);
+    rememberSession(session.session_id);
+    clearThread();
+    for (const turn of session.turns) {
+      appendTurn(turn.question, { ...turn.answer, asked_at: turn.created_at }, { scroll: false });
+    }
+    const scopeDoc = session.document_scope && session.document_scope.document_id;
+    document.getElementById("scope").value =
+      scopeDoc && state.documents.some((d) => d.document_id === scopeDoc) ? scopeDoc : "";
+    renderSessions();
+    setMessage("ask-message", "Reopened conversation. Follow-up questions continue from here.");
+    const thread = document.getElementById("thread");
+    if (thread.lastElementChild) thread.lastElementChild.scrollIntoView({ block: "start" });
+  } catch (err) {
+    if (sessionId === state.sessionId) rememberSession(null);
+    setMessage("ask-message", err.message, true);
+  }
+}
+
+async function deleteSession(session) {
+  if (!window.confirm(`Delete the conversation "${session.title}"?`)) return;
+  try {
+    await api(`/conversation/${encodeURIComponent(session.session_id)}`, { method: "DELETE" });
+    if (session.session_id === state.sessionId) newConversation();
+    await loadSessions();
+  } catch (err) {
+    setMessage("ask-message", err.message, true);
+  }
 }
 
 function renderAnswer(answer) {
@@ -246,10 +368,10 @@ function renderAnswer(answer) {
     card.append(el("p", { class: "abstention", text: "This answer has no citations." }));
   }
 
-  card.append(el("p", {
-    class: "timing",
-    text: `Answered in ${formatSeconds(answer.total_latency_seconds)}`,
-  }));
+  const timing = typeof answer.total_latency_seconds === "number"
+    ? `Answered in ${formatSeconds(answer.total_latency_seconds)}`
+    : answer.asked_at ? `Asked ${formatWhen(answer.asked_at)}` : null;
+  if (timing) card.append(el("p", { class: "timing", text: timing }));
   return card;
 }
 
@@ -313,10 +435,103 @@ async function loadPassage(citation, number, panel) {
 // Start-up
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Accounts
+// ---------------------------------------------------------------------------
+
+function showSignIn(message = "") {
+  state.user = null;
+  state.sessionId = null;
+  state.documents = [];
+  state.sessions = [];
+  // Remove the previous user's data from the page.
+  for (const id of ["thread", "document-list", "session-list"]) {
+    document.getElementById(id).replaceChildren();
+  }
+  renderScopeOptions();
+  document.getElementById("app-view").hidden = true;
+  document.getElementById("account").hidden = true;
+  document.getElementById("auth-view").hidden = false;
+  setAuthMode(false);
+  setMessage("auth-message", message, Boolean(message));
+  document.getElementById("auth-email").focus();
+}
+
+function setAuthMode(registering) {
+  state.registering = registering && state.registrationOpen;
+  const r = state.registering;
+  document.getElementById("auth-heading").textContent = r ? "Create an account" : "Sign in";
+  document.getElementById("auth-submit").textContent = r ? "Create account" : "Sign in";
+  document.getElementById("name-field").hidden = !r;
+  document.getElementById("password-hint").hidden = !r;
+  document.getElementById("auth-password").autocomplete = r ? "new-password" : "current-password";
+  document.getElementById("auth-switch-text").textContent = r ? "Already have an account?" : "New here?";
+  document.getElementById("auth-toggle").textContent = r ? "Sign in" : "Create an account";
+  document.getElementById("auth-switch").hidden = !state.registrationOpen;
+  setMessage("auth-message", "");
+}
+
+async function submitAuth(event) {
+  event.preventDefault();
+  const email = document.getElementById("auth-email").value.trim();
+  const password = document.getElementById("auth-password").value;
+  if (!email || !password) {
+    setMessage("auth-message", "Enter your email and password.", true);
+    return;
+  }
+  const body = { email, password };
+  if (state.registering) {
+    const name = document.getElementById("auth-name").value.trim();
+    if (name) body.display_name = name;
+  }
+  const button = document.getElementById("auth-submit");
+  button.disabled = true;
+  try {
+    const user = await api(state.registering ? "/auth/register" : "/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    document.getElementById("auth-form").reset();
+    await enterApp(user);
+  } catch (err) {
+    setMessage("auth-message", err.message, true);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function signOut() {
+  try {
+    await api("/auth/logout", { method: "POST" });
+  } finally {
+    showSignIn("You have signed out.");
+    document.getElementById("auth-message").classList.remove("error");
+  }
+}
+
+async function enterApp(user) {
+  state.user = user;
+  document.getElementById("auth-view").hidden = true;
+  document.getElementById("app-view").hidden = false;
+  document.getElementById("account").hidden = false;
+  document.getElementById("account-name").textContent = user.display_name;
+  document.getElementById("account-name").title = user.email;
+  clearThread();
+  setMessage("ask-message", "");
+  setMessage("upload-message", "");
+  await loadDocuments().catch((err) => setMessage("upload-message", err.message, true));
+  await loadSessions().catch((err) => setMessage("ask-message", err.message, true));
+  const saved = savedSession();
+  if (saved && state.sessions.some((s) => s.session_id === saved)) await openSession(saved);
+  else rememberSession(null);
+}
+
 async function checkHealth() {
   const status = document.getElementById("llm-status");
   try {
     const health = await api("/health");
+    state.registrationOpen = health.registration_open;
     status.textContent = health.llm_configured
       ? "Ready"
       : "No language model configured: you can upload and browse documents, "
@@ -329,15 +544,22 @@ async function checkHealth() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("upload-form").addEventListener("submit", uploadDocument);
   document.getElementById("ask-form").addEventListener("submit", askQuestion);
   document.getElementById("new-conversation").addEventListener("click", newConversation);
+  document.getElementById("auth-form").addEventListener("submit", submitAuth);
+  document.getElementById("auth-toggle").addEventListener("click", () => setAuthMode(!state.registering));
+  document.getElementById("sign-out").addEventListener("click", signOut);
   document.getElementById("question").addEventListener("keydown", (event) => {
     if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
       document.getElementById("ask-form").requestSubmit();
     }
   });
-  checkHealth();
-  loadDocuments().catch((err) => setMessage("upload-message", err.message, true));
+  await checkHealth();
+  try {
+    await enterApp(await api("/auth/me"));
+  } catch {
+    showSignIn();
+  }
 });

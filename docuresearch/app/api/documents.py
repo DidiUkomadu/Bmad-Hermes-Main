@@ -13,7 +13,7 @@ from pathlib import PurePath
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 from pypdf.errors import PyPdfError
 
-from app.api.deps import AppState, get_conn, get_state
+from app.api.deps import AppState, current_user, get_conn, get_state
 from app.api.errors import APIError
 from app.api.schemas import (
     DocumentListResponse,
@@ -21,6 +21,7 @@ from app.api.schemas import (
     RemovalResponse,
     UploadResponse,
 )
+from app.auth import User
 from app.ingestion.orchestrator import (
     SUPPORTED_EXTENSIONS,
     DuplicateDocumentError,
@@ -51,6 +52,7 @@ def upload_document(
     name: str | None = Form(None),
     state: AppState = Depends(get_state),
     conn: sqlite3.Connection = Depends(get_conn),
+    user: User = Depends(current_user),
 ) -> UploadResponse:
     """Upload a PDF, Markdown, or TXT file and ingest it."""
     filename = PurePath(file.filename or "").name
@@ -69,7 +71,7 @@ def upload_document(
         raise APIError(400, "Empty file", f"'{filename}' contains no data")
 
     try:
-        result = state.pipeline.ingest_bytes(data, filename)
+        result = state.pipeline.ingest_bytes(data, filename, owner_id=user.id)
     except DuplicateDocumentError as exc:
         raise APIError(409, "Document already exists", str(exc)) from exc
     except (ValueError, PyPdfError) as exc:
@@ -80,9 +82,9 @@ def upload_document(
 
     document_id = result["document_id"]
     if name and name.strip():
-        rename_document(conn, document_id, name.strip())
+        rename_document(conn, document_id, name.strip(), owner_id=user.id)
 
-    doc = get_document(conn, document_id)
+    doc = get_document(conn, document_id, owner_id=user.id)
     assert doc is not None  # just ingested
     return UploadResponse(
         **_document_response(doc).model_dump(), passage_count=result["passage_count"]
@@ -92,9 +94,10 @@ def upload_document(
 @router.get("", response_model=DocumentListResponse)
 def list_uploaded_documents(
     conn: sqlite3.Connection = Depends(get_conn),
+    user: User = Depends(current_user),
 ) -> DocumentListResponse:
-    """List uploaded documents, oldest first."""
-    docs = sorted(list_documents(conn), key=lambda d: d.uploaded_at)
+    """List the signed-in user's documents, oldest first."""
+    docs = sorted(list_documents(conn, owner_id=user.id), key=lambda d: d.uploaded_at)
     return DocumentListResponse(documents=[_document_response(d) for d in docs])
 
 
@@ -102,8 +105,9 @@ def list_uploaded_documents(
 def remove_document(
     document_id: str,
     conn: sqlite3.Connection = Depends(get_conn),
+    user: User = Depends(current_user),
 ) -> RemovalResponse:
-    """Remove a document and all its passages."""
-    if not delete_document(conn, document_id):
+    """Remove one of the signed-in user's documents and all its passages."""
+    if not delete_document(conn, document_id, owner_id=user.id):
         raise APIError(404, "Document not found", document_id)
     return RemovalResponse(document_id=document_id)

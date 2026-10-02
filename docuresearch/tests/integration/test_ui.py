@@ -19,7 +19,14 @@ from app.config import Settings
 from app.main import create_app
 from app.pipeline import ResearchPipeline
 from app.store.schema import get_connection, get_passage
-from tests.integration.fakes import DOCS, HashEmbedding, ScriptedLLM, answer_json, passages_in
+from tests.integration.fakes import (
+    DOCS,
+    HashEmbedding,
+    ScriptedLLM,
+    answer_json,
+    passages_in,
+    sign_up,
+)
 
 API = "/api/v1"
 STATIC = Path(__file__).resolve().parents[2] / "app" / "static"
@@ -34,6 +41,7 @@ def client_with(tmp_path):
         client = TestClient(create_app(Settings(db_path=tmp_path / "ui.db"), pipeline))
         client.__enter__()
         clients.append(client)
+        sign_up(client)
         for name in docs:
             resp = client.post(f"{API}/documents/upload",
                                files={"file": (name, (DOCS / name).read_bytes())})
@@ -134,7 +142,8 @@ def test_citation_of_removed_document_reports_missing(client_with):
     [citation] = client.post(f"{API}/query", json={"question": "encryption"}).json()["answer"][
         "citations"
     ]
-    client.delete(f"{API}/documents/sample-spec-pdf-d58d38e8")
+    [doc] = client.get(f"{API}/documents").json()["documents"]
+    client.delete(f"{API}/documents/{doc['document_id']}")
     resp = client.get(f"{API}/citations/{quote(citation['passage_id'])}")
     assert resp.status_code == 404  # the UI shows "could not be loaded … removed"
 

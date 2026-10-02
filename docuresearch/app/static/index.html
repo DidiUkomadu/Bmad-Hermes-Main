@@ -13,10 +13,41 @@
       <h1>DocuResearch</h1>
       <p>Answers from your documents, with every claim traceable to its source.</p>
     </div>
-    <p id="llm-status" class="status" role="status"></p>
+    <div class="account">
+      <p id="llm-status" class="status" role="status"></p>
+      <p id="account" class="account-user" hidden>
+        <span id="account-name"></span>
+        <button id="sign-out" type="button" class="secondary">Sign out</button>
+      </p>
+    </div>
   </header>
 
-  <div class="layout">
+  <main id="auth-view" class="auth" hidden>
+    <section class="panel auth-card" aria-labelledby="auth-heading">
+      <h2 id="auth-heading">Sign in</h2>
+      <p class="auth-intro">Your documents and conversations are private to your account.</p>
+      <form id="auth-form" novalidate>
+        <div id="name-field" hidden>
+          <label for="auth-name">Name <span class="hint">(optional)</span></label>
+          <input id="auth-name" name="display_name" type="text" autocomplete="name" maxlength="80">
+        </div>
+        <label for="auth-email">Email</label>
+        <input id="auth-email" name="email" type="email" autocomplete="email" required>
+        <label for="auth-password">Password</label>
+        <input id="auth-password" name="password" type="password" autocomplete="current-password"
+               minlength="8" required>
+        <p id="password-hint" class="hint-text" hidden>At least 8 characters.</p>
+        <button id="auth-submit" type="submit">Sign in</button>
+        <p id="auth-message" class="message" role="alert"></p>
+      </form>
+      <p id="auth-switch" class="auth-switch">
+        <span id="auth-switch-text">New here?</span>
+        <button id="auth-toggle" type="button" class="link">Create an account</button>
+      </p>
+    </section>
+  </main>
+
+  <div id="app-view" class="layout" hidden>
     <aside class="panel documents" aria-labelledby="docs-heading">
       <h2 id="docs-heading">Documents</h2>
       <form id="upload-form" class="upload">
@@ -29,6 +60,12 @@
       </form>
       <ul id="document-list" class="document-list"></ul>
       <p id="document-empty" class="empty">No documents yet. Upload one to start asking questions.</p>
+
+      <section class="sessions" aria-labelledby="sessions-heading">
+        <h2 id="sessions-heading">Conversations</h2>
+        <ul id="session-list" class="session-list"></ul>
+        <p id="session-empty" class="empty">Your conversations will appear here.</p>
+      </section>
     </aside>
 
     <main class="panel conversation" aria-labelledby="ask-heading">

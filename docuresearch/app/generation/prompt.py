@@ -57,6 +57,7 @@ class ConversationTurn:
     evidence_quality: EvidenceQuality
     is_abstention: bool
     created_at: datetime
+    evidence_quality_narrative: str = ""
 
 
 @dataclass(frozen=True)
@@ -306,14 +307,21 @@ This is the first turn in the conversation. No prior context is available."""
         "Previous turns are provided for context:"
     ]
     for turn in history:
+        sources = "; ".join(
+            f"{c.document_name}, {c.location} (Passage ID: {c.passage_id})" for c in turn.citations
+        )
         parts.append(
             f"\n--- Turn {turn.turn_index} ---\n"
             f"User: {turn.user_query}\n"
             f"Assistant: {turn.answer_text}\n"
             f"(Evidence quality: {turn.evidence_quality}; Abstention: {turn.is_abstention})\n"
+            f"Sources cited: {sources or 'none'}\n"
         )
     parts.append(
-        "\nUse the conversation history to maintain consistency with prior answers. "
+        "\nThe user's question may refer back to these turns (for example \"it\" or "
+        "\"that\"); interpret it in light of the conversation. Passages cited by earlier "
+        "answers are included among the retrieved passages above when still available.\n"
+        "Use the conversation history to maintain consistency with prior answers. "
         "Do not contradict earlier answers unless the retrieved passages clearly support "
         "a different conclusion.\n"
         "The conversation history is context only, not a source. Every claim in your "

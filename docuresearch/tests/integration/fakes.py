@@ -82,3 +82,17 @@ class CiteLLM(ScriptedLLM):
         if not hits:
             return answer_json([], quality="insufficient", text="Not in the documents.")
         return answer_json([hits[0]], text=f"Answer citing '{phrase}'.")
+
+
+DEFAULT_PASSWORD = "correct horse battery"
+
+
+def sign_up(client, email: str = "user@example.com", password: str = DEFAULT_PASSWORD,
+            display_name: str | None = None) -> dict:
+    """Register (and thereby sign in) on a TestClient, which keeps the session cookie."""
+    body = {"email": email, "password": password}
+    if display_name:
+        body["display_name"] = display_name
+    resp = client.post("/api/v1/auth/register", json=body)
+    assert resp.status_code == 201, resp.text
+    return resp.json()

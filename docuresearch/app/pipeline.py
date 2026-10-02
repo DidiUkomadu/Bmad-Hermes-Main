@@ -125,23 +125,27 @@ class ResearchPipeline:
     # Ingestion
     # ------------------------------------------------------------------
 
-    def ingest(self, source: str | Path) -> dict[str, Any]:
+    def ingest(self, source: str | Path, owner_id: str | None = None) -> dict[str, Any]:
         """Ingest a document from disk, embedding its passages."""
         return ingest_document(
             source,
             db_path=self._db_path,
             chunking_config=self._chunking_config,
             embedding_model=self._embedding_model,
+            owner_id=owner_id,
         )
 
-    def ingest_bytes(self, data: bytes, filename: str) -> dict[str, Any]:
-        """Ingest an uploaded document, embedding its passages."""
+    def ingest_bytes(
+        self, data: bytes, filename: str, owner_id: str | None = None
+    ) -> dict[str, Any]:
+        """Ingest an uploaded document as *owner_id*'s, embedding its passages."""
         return ingest_document_bytes(
             data,
             filename,
             db_path=self._db_path,
             chunking_config=self._chunking_config,
             embedding_model=self._embedding_model,
+            owner_id=owner_id,
         )
 
     # ------------------------------------------------------------------
@@ -154,14 +158,18 @@ class ResearchPipeline:
         document_id: str | None = None,
         conversation_history: list[ConversationTurn] | None = None,
         retrieval_query: str | None = None,
+        owner_id: str | None = None,
     ) -> PipelineResult:
         """Answer *query*, optionally restricted to one document.
 
         *retrieval_query*, when given, is searched instead of *query* (e.g. a
         follow-up expanded with conversation context); the prompt always
-        carries the user's *query* verbatim.
+        carries the user's *query* verbatim. *owner_id* restricts the search
+        to that user's documents (see ``retrieve``).
         """
-        context = self.retrieve(query, document_id, conversation_history, retrieval_query)
+        context = self.retrieve(
+            query, document_id, conversation_history, retrieval_query, owner_id=owner_id
+        )
         return PipelineResult(answer=self.generate(context), context=context)
 
     def retrieve(
@@ -170,13 +178,20 @@ class ResearchPipeline:
         document_id: str | None = None,
         conversation_history: list[ConversationTurn] | None = None,
         retrieval_query: str | None = None,
+        owner_id: str | None = None,
     ) -> RetrievedContext:
-        """Run scoped hybrid retrieval and package the result for generation."""
+        """Run scoped hybrid retrieval and package the result for generation.
+
+        Only the documents of *owner_id* are loaded into the search index, so
+        another user's passages can never be retrieved, cited, or shown to the
+        model (Epic 8 isolation). ``None`` searches every document and is for
+        trusted internal callers (the evaluation runner), never the API.
+        """
         start = time.monotonic()
         set_db_path(self._db_path)
         conn = get_connection()
         try:
-            doc_names = {d.id: d.name for d in list_documents(conn)}
+            doc_names = {d.id: d.name for d in list_documents(conn, owner_id=owner_id)}
             passages = {
                 p.id: p
                 for doc_id in doc_names
