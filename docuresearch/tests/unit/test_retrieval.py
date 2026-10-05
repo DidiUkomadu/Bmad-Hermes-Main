@@ -314,28 +314,20 @@ class TestCosineSimilarity:
 class TestEmbeddingModelInterface:
     """Story 3.1: Embedding model abstraction."""
 
-    def test_sentence_transformer_loads(self):
+    def test_sentence_transformer_loads(self, real_embedding_model):
         """SentenceTransformerEmbeddingModel should load without error."""
-        from app.retrieval.semantic import SentenceTransformerEmbeddingModel
-        model = SentenceTransformerEmbeddingModel()
-        # Access dimension to trigger model loading
-        dim = model.dimension
-        assert dim == 384
+        assert real_embedding_model.dimension == 384
 
-    def test_embedding_shape(self):
+    def test_embedding_shape(self, real_embedding_model):
         """Embedding should have the expected dimensionality."""
-        from app.retrieval.semantic import SentenceTransformerEmbeddingModel
-        model = SentenceTransformerEmbeddingModel()
-        emb = model.embed("test query")
+        emb = real_embedding_model.embed("test query")
         assert len(emb) == 384
         assert all(isinstance(x, float) for x in emb)
 
-    def test_embedding_deterministic(self):
+    def test_embedding_deterministic(self, real_embedding_model):
         """Same text should produce the same embedding (deterministic)."""
-        from app.retrieval.semantic import SentenceTransformerEmbeddingModel
-        model = SentenceTransformerEmbeddingModel()
-        emb1 = model.embed("test query text")
-        emb2 = model.embed("test query text")
+        emb1 = real_embedding_model.embed("test query text")
+        emb2 = real_embedding_model.embed("test query text")
         assert emb1 == emb2
 
 
