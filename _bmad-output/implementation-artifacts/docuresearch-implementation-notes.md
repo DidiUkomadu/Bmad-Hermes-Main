@@ -9,7 +9,7 @@ This file records where the built product differs from the approved plan and why
 ## How it was built
 
 - **Epics 0–4** were implemented by Hermes Agent (Nous Portal, `upstage/solar-pro4:free`), story by story from the BMad artifacts, with each report reviewed against the acceptance criteria.
-- **From Epic 5 onwards**, work continued with Claude Code after the Hermes Nous session was revoked and further use required payment. The same artifacts and acceptance criteria were followed.
+- **From Epic 5 onwards**, work continued with another AI coding assistant after the Hermes Nous session was revoked and further use required payment. The same artifacts and acceptance criteria were followed.
 - **Integration** came before Epic 5. The components from Epics 1–4 were unit-tested but not connected, so the end-to-end pipeline (`app/pipeline.py`) was built first, to measure grounding against a real model before adding features.
 
 ## Deviations from the plan
