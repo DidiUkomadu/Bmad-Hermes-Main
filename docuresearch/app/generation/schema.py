@@ -177,6 +177,11 @@ def _extract_json_block(text: str) -> str | None:
     return None
 
 
+def extract_json_block(text: str) -> str | None:
+    """Public form of the JSON-object extraction used for LLM output (e.g. by the judge)."""
+    return _extract_json_block(text)
+
+
 def _looks_like_json(s: str) -> bool:
     """Quick check: does *s* start with '{' and end with '}'?"""
     return s.startswith("{") and s.endswith("}")

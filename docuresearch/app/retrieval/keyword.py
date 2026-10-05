@@ -29,17 +29,25 @@ from rank_bm25 import BM25L
 
 from app.retrieval.interface import KeywordRetriever, RetrievalResult
 
+# Common English function words. Without this, question words such as
+# "how", "is", "to", "be" dominate BM25 on long passages, burying the passage
+# that actually answers (found in the RFC 7519 evaluation, Epic 0). The list is
+# deliberately small so technical tokens are never dropped.
+STOPWORDS = frozenset(
+    "a an and are as at be by can do does for from has have how in is it its meant of on "
+    "or should that the their this to was what when where which who why will with".split()
+)
+
 
 def _tokenize(text: str) -> list[str]:
     """Tokenize text for BM25 indexing.
 
-    Lowercases and splits on non-alphanumeric characters, keeping tokens
-    with length > 1. Consistent with the project's existing tokenization
-    in evaluation/runner.py.
+    Lowercases, splits on non-alphanumeric characters, and keeps tokens with
+    length > 1 that are not stopwords.
     """
     text = text.lower()
     text = re.sub(r"[^a-z0-9\s]", " ", text)
-    return [t for t in text.split() if len(t) > 1]
+    return [t for t in text.split() if len(t) > 1 and t not in STOPWORDS]
 
 
 class BM25RetrieverImpl(KeywordRetriever):

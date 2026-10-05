@@ -108,7 +108,12 @@ class ResearchPipeline:
         self._embedding_model = embedding_model or SentenceTransformerEmbeddingModel()
         self._weighting = weighting or HybridWeighting()
         self._ranking = RankingLayer(max_candidates)
-        self._generation_config = generation_config or GenerationConfig()
+        # By default the prompt shows every retrieved candidate: a passage that
+        # counts as "retrieved" but is cut from the prompt can't be used, and
+        # the model wrongly concludes the documents lack the answer.
+        self._generation_config = generation_config or GenerationConfig(
+            max_passages_in_prompt=max_candidates
+        )
         self._chunking_config = chunking_config
 
         set_db_path(db_path)

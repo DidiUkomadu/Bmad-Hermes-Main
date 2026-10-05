@@ -36,6 +36,10 @@ select = ["E", "F", "I", "N", "W", "UP"]
 testpaths = ["tests"]
 pythonpath = ["."]
 
+[tool.hatch.build.targets.wheel]
+# The project directory is not named after the project, so list the packages.
+packages = ["app", "evaluation"]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

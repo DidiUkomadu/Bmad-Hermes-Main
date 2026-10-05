@@ -55,6 +55,21 @@
       ],
       "page_count": null,
       "description": "Short release notes for the Omega Framework. Deliberately gives a first-release date (March 2018) that conflicts with sample_document.txt (2020); used by q-022."
+    },
+    {
+      "id": "rfc7519",
+      "filename": "rfc7519.txt",
+      "format": "txt",
+      "name": "RFC 7519: JSON Web Token (JWT)",
+      "tags": [
+        "real-specification",
+        "rfc",
+        "page-headers-footers",
+        "long-document"
+      ],
+      "page_count": 30,
+      "description": "The published IETF specification for JSON Web Tokens (30 pages, plain text, unmodified). Included as a realistic document: page headers/footers, a table of contents, definitions split across page breaks. RFCs may be copied in full under the IETF Trust Legal Provisions (BCP 78).",
+      "source": "https://www.rfc-editor.org/rfc/rfc7519.txt"
     }
   ]
 }

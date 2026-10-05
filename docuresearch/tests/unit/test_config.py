@@ -14,7 +14,7 @@ def test_defaults_without_config_file(tmp_path, monkeypatch):
     s = Settings.load(env={})
     assert s.max_candidates == 20
     assert s.max_history_turns == 5
-    assert (s.semantic_weight, s.keyword_weight) == (0.5, 0.5)
+    assert (s.semantic_weight, s.keyword_weight) == (0.7, 0.3)  # tuned on the eval dataset
     assert s.llm.configured is False
 
 
@@ -110,3 +110,21 @@ def test_empty_env_file_value_means_unset(tmp_path, monkeypatch):
     monkeypatch.setattr("app.config.DEFAULT_ENV_PATH", env_file)
     monkeypatch.delenv("DOCURESEARCH_LLM_API_KEY", raising=False)
     assert Settings.load().llm.api_key is None
+
+
+def test_llm_settings_are_trimmed(tmp_path):
+    """Docker's --env-file keeps spaces after '='; a padded key must still work."""
+    s = Settings.load(env={
+        "DOCURESEARCH_CONFIG": "",
+        "DOCURESEARCH_LLM_BASE_URL": " https://openrouter.ai/api/v1 ",
+        "DOCURESEARCH_LLM_MODEL": " some/model:free",
+        "DOCURESEARCH_LLM_API_KEY": " sk-or-v1-abc ",
+    })
+    assert s.llm.base_url == "https://openrouter.ai/api/v1"
+    assert s.llm.model == "some/model:free"
+    assert s.llm.api_key == "sk-or-v1-abc"
+
+
+def test_blank_llm_settings_mean_unset():
+    s = Settings.load(env={"DOCURESEARCH_CONFIG": "", "DOCURESEARCH_LLM_API_KEY": "   "})
+    assert s.llm.api_key is None

@@ -149,6 +149,11 @@ class EvaluationResult:
         retrieval_recall: Computed retrieval recall for this question.
         citation_correctness: Fraction of citations that are correct (0–1).
         answer_faithful: Boolean — was the answer faithful to retrieved passages?
+        claims_total: Factual claims the judge found in the answer (judge runs only).
+        claims_supported: How many of those claims the passages support.
+        unsupported_claims: The unsupported claims, each with the judge's reason.
+        citation_support: Fraction of citations whose passage supports a claim.
+        judge_error: Why the judge could not assess the answer, if it could not.
         abstention_correct: Boolean — was the abstention decision correct?
         conflict_handled: Boolean — was the conflict correctly surfaced?
         retrieval_latency_s: Retrieval latency in seconds.
@@ -167,6 +172,11 @@ class EvaluationResult:
     retrieval_recall: float | None = None
     citation_correctness: float | None = None
     answer_faithful: bool | None = None
+    claims_total: int | None = None
+    claims_supported: int | None = None
+    unsupported_claims: list[str] = field(default_factory=list)
+    citation_support: float | None = None
+    judge_error: str | None = None
     abstention_correct: bool | None = None
     conflict_handled: bool | None = None
     retrieval_latency_s: float = 0.0
@@ -190,6 +200,11 @@ class EvaluationResult:
             "retrieval_recall": self.retrieval_recall,
             "citation_correctness": self.citation_correctness,
             "answer_faithful": self.answer_faithful,
+            "claims_total": self.claims_total,
+            "claims_supported": self.claims_supported,
+            "unsupported_claims": self.unsupported_claims,
+            "citation_support": self.citation_support,
+            "judge_error": self.judge_error,
             "abstention_correct": self.abstention_correct,
             "conflict_handled": self.conflict_handled,
             "retrieval_latency_s": self.retrieval_latency_s,
@@ -208,6 +223,7 @@ class EvaluationResult:
             _fmt("prec", self.retrieval_precision),
             _fmt("rec", self.retrieval_recall),
             _fmt("cit", self.citation_correctness),
+            _fmt("cit_sup", self.citation_support),
             f"lat={self.total_latency_s:.3f}s",
         ]
         return "  ".join(parts)

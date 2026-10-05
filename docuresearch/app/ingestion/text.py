@@ -3,6 +3,15 @@
 Splits plain text on paragraph boundaries (blank-line-separated groups).
 Provides paragraph index and character offset locators.
 
+Paginated plain text (e.g. IETF RFCs) is cleaned before chunking, because
+running page headers/footers become tiny passages that crowd out real content
+in keyword retrieval, and headings separated from their text are unfindable:
+- Running heads: short one-line paragraphs that repeat at least
+  ``RUNNING_HEAD_MIN_REPEATS`` times (ignoring digits, e.g. page numbers) are
+  dropped, as are form-feed characters.
+- Numbered section headings ("4.1.4. ...", "Appendix A. ...") are joined to
+  the paragraph that follows them.
+
 API:
     parse_plain_text(file_bytes: bytes, filename: str) -> RawDocument
 """
@@ -10,6 +19,8 @@ API:
 from __future__ import annotations
 
 import logging
+import re
+from collections import Counter
 from datetime import UTC, datetime
 from typing import Any
 
@@ -20,6 +31,10 @@ logger = logging.getLogger(__name__)
 # Minimum characters to consider a group a "paragraph" (below this, treat
 # as a line group within the previous paragraph)
 MIN_PARAGRAPH_CHARS = 10
+
+RUNNING_HEAD_MIN_REPEATS = 3
+RUNNING_HEAD_MAX_CHARS = 100
+_NUMBERED_HEADING = re.compile(r"^(?:\d+(?:\.\d+)*\.?|Appendix [A-Z](?:\.\d+)*\.?)\s+\S")
 
 
 def parse_plain_text(file_bytes: bytes, filename: str) -> RawDocument:
@@ -41,8 +56,11 @@ def parse_plain_text(file_bytes: bytes, filename: str) -> RawDocument:
     except UnicodeDecodeError:
         text = file_bytes.decode("latin-1")
 
-    # Split on blank-line boundaries (one or more empty lines)
-    raw_paragraphs = _split_paragraphs(text)
+    # Split on blank-line boundaries (one or more empty lines), then clean up
+    # pagination artefacts.
+    raw_paragraphs = _attach_numbered_headings(
+        _drop_running_heads(_split_paragraphs(text.replace("\f", "\n")))
+    )
 
     units: list[dict[str, Any]] = []
     full_text_parts: list[str] = []
@@ -89,8 +107,6 @@ def _split_paragraphs(text: str) -> list[str]:
     A blank line is one or more consecutive newlines surrounded by whitespace.
     Consecutive non-empty lines form a paragraph group.
     """
-    import re
-
     # Split on two or more newlines (blank line separator)
     parts = re.split(r"\n\s*\n", text)
 
@@ -107,6 +123,48 @@ def _split_paragraphs(text: str) -> list[str]:
         if lines:
             result = ["\n".join(lines)]
 
+    return result
+
+
+def _running_head_key(paragraph: str) -> str | None:
+    """Normalised form of a possible page header/footer, or None if it can't be one."""
+    if "\n" in paragraph or len(paragraph) > RUNNING_HEAD_MAX_CHARS:
+        return None
+    return re.sub(r"\d+", "#", " ".join(paragraph.split()))
+
+
+def _drop_running_heads(paragraphs: list[str]) -> list[str]:
+    """Remove short one-line paragraphs repeated on many pages (headers/footers)."""
+    counts = Counter(k for p in paragraphs if (k := _running_head_key(p)) is not None)
+    repeated = {k for k, n in counts.items() if n >= RUNNING_HEAD_MIN_REPEATS}
+    if not repeated:
+        return paragraphs
+    kept = [p for p in paragraphs if _running_head_key(p) not in repeated]
+    logger.info("Dropped %d running header/footer paragraphs", len(paragraphs) - len(kept))
+    return kept
+
+
+def _attach_numbered_headings(paragraphs: list[str]) -> list[str]:
+    """Join a numbered section heading to the paragraph that follows it."""
+    result: list[str] = []
+    pending: str | None = None
+    for p in paragraphs:
+        is_heading = "\n" not in p and len(p) <= RUNNING_HEAD_MAX_CHARS and bool(
+            _NUMBERED_HEADING.match(p)
+        )
+        if pending is not None:
+            if is_heading:
+                result.append(pending)  # consecutive headings: keep the first alone
+                pending = p
+                continue
+            result.append(f"{pending}\n{p}")
+            pending = None
+        elif is_heading:
+            pending = p
+        else:
+            result.append(p)
+    if pending is not None:
+        result.append(pending)
     return result
 
 

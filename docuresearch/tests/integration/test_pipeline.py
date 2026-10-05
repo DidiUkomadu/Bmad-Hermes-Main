@@ -210,3 +210,29 @@ def test_openai_compat_reports_embedded_error_message(monkeypatch):
     resp = _llm_with(lambda r: httpx.Response(200, json=body)).generate("PROMPT")
     assert "provider error 400" in resp.parse_error
     assert "model does not support this" in resp.parse_error
+
+
+def test_openai_compat_retries_network_errors(monkeypatch):
+    monkeypatch.setattr("app.generation.openai_compat.time.sleep", lambda s: None)
+    calls = []
+
+    def handler(request):
+        calls.append(1)
+        if len(calls) < 3:
+            raise httpx.ConnectError("Temporary failure in name resolution", request=request)
+        return httpx.Response(200, json={"choices": [{"message": {"content": _answer_json([])}}]})
+
+    resp = _llm_with(handler).generate("PROMPT")
+    assert resp.parse_error is None
+    assert len(calls) == 3
+
+
+def test_openai_compat_reports_persistent_network_failure(monkeypatch):
+    monkeypatch.setattr("app.generation.openai_compat.time.sleep", lambda s: None)
+
+    def handler(request):
+        raise httpx.ConnectError("Temporary failure in name resolution", request=request)
+
+    resp = _llm_with(handler).generate("PROMPT")
+    assert resp.structured is None
+    assert "name resolution" in resp.parse_error

@@ -1,0 +1,91 @@
+# DocuResearch — sprint status (BMad v6 format)
+#
+# Status values
+#   epic:  backlog | in-progress | done
+#   story: backlog | ready-for-dev | in-progress | review | done
+#   retrospective: optional | done
+#
+# Sources: planning-artifacts/docuresearch-epics-stories.md (Epics 0–7) and
+# planning-artifacts/docuresearch-change-proposal-multi-user.md (Epic 8).
+# Deviations from the plan: implementation-artifacts/docuresearch-implementation-notes.md
+
+generated: 2026-10-05
+project: DocuResearch
+project_key: docuresearch
+tracking_system: file-system
+story_location: _bmad-output/planning-artifacts/docuresearch-epics-stories.md
+
+development_status:
+  # Epic 0: Evaluation dataset (enabling workstream)
+  epic-0: done
+  0-1-define-evaluation-methodology: done
+  0-2-curate-representative-documents: done        # 5 documents incl. RFC 7519 (real spec)
+  0-3-curate-questions-with-gold-answers: done     # 36 questions, all five evidence types
+  0-4-evaluation-run-capability: done              # runner + LLM faithfulness judge
+  epic-0-retrospective: optional
+
+  # Epic 1: Document ingestion
+  epic-1: done
+  1-1-pdf-text-extraction: done
+  1-2-markdown-parsing: done
+  1-3-plain-text-ingestion: done                   # + page header/footer removal
+  1-4-chunking-strategy: done
+  1-5-ingestion-orchestration: done                # atomic, embeds at ingest
+  epic-1-retrospective: optional
+
+  # Epic 2: Content store
+  epic-2: done
+  2-1-document-and-passage-persistence: done
+  2-2-passage-deletion-and-document-removal: done
+  epic-2-retrospective: optional
+
+  # Epic 3: Retrieval
+  epic-3: done
+  3-1-semantic-retrieval: done
+  3-2-keyword-bm25-retrieval: done                 # + stopwords
+  3-3-hybrid-retrieval: done                       # weights tuned to 0.7 / 0.3
+  3-4-document-scope-filtering: done
+  3-5-ranking-and-candidate-set: done
+  epic-3-retrospective: optional
+
+  # Epic 4: Generation
+  epic-4: done
+  4-1-model-agnostic-llm-interface: done           # OpenAI-compatible backend
+  4-2-prompt-construction: done
+  4-3-structured-output-schema: done
+  4-4-abstention-logic: done
+  4-5-partial-and-conflicting-evidence: done
+  4-6-citation-generation: done                    # + uncited answers withheld
+  epic-4-retrospective: optional
+
+  # Epic 5: Conversational follow-up
+  epic-5: done
+  5-1-conversation-context-storage: done
+  5-2-follow-up-query-with-context: done
+  epic-5-retrospective: optional
+
+  # Epic 6: Interactive citation UI
+  epic-6: done
+  6-1-citation-rendering: done
+  6-2-citation-ui-multi-document: done
+  epic-6-retrospective: optional
+
+  # Epic 7: Application layer (FastAPI)
+  epic-7: done
+  7-1-api-contract-definition: done
+  7-2-document-upload-endpoint: done
+  7-3-query-endpoint: done
+  7-4-citation-lookup-endpoint: done
+  7-5-document-list-and-removal: done
+  7-6-application-wiring-and-startup: done
+  epic-7-retrospective: optional
+
+  # Epic 8: Multi-user accounts and data isolation (change proposal, 2026-10-02)
+  epic-8: done
+  8-1-accounts: done
+  8-2-sessions: done
+  8-3-document-ownership-and-retrieval-isolation: done
+  8-4-conversation-ownership: done
+  8-5-sign-in-ui: done
+  8-6-migration-of-existing-data: done
+  epic-8-retrospective: optional

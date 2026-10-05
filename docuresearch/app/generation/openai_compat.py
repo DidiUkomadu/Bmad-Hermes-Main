@@ -125,16 +125,24 @@ class OpenAICompatibleLLM:
     def _post_with_retry(self, payload: dict[str, Any]) -> httpx.Response:
         """POST, retrying rate limits (429) and server errors (5xx) with backoff.
 
-        Free tiers are often briefly rate-limited upstream; a few short retries
-        keep one busy moment from failing a request. Honors ``Retry-After``
-        (capped). Other errors are raised immediately.
+        Free tiers are often briefly rate-limited upstream, and home networks
+        drop DNS now and then; a few short retries keep one bad moment from
+        failing a request. Network errors (``httpx.TransportError``) are retried
+        too. Honors ``Retry-After`` (capped). Other errors are raised immediately.
 
         Some gateways (e.g. OpenRouter) report provider errors inside a 200
         response as ``{"error": {"code": ..., "message": ...}}``; those are
         treated by their embedded code.
         """
         for attempt in range(self._max_retries + 1):
-            resp = self._client.post(self._url, json=payload, headers=self._headers)
+            try:
+                resp = self._client.post(self._url, json=payload, headers=self._headers)
+            except httpx.TransportError:
+                # Network blip (DNS failure, refused connection, timeout): retry.
+                if attempt == self._max_retries:
+                    raise
+                time.sleep(min(self._backoff_seconds * 2**attempt, _MAX_RETRY_DELAY_SECONDS))
+                continue
             status = _effective_status(resp)
             retryable = status == 429 or status >= 500
             if not retryable or attempt == self._max_retries:

@@ -133,11 +133,16 @@ class TestBM25Tokenization:
         assert "!" not in tokens
         assert "aes" in tokens or "256" in tokens
 
-    def test_filters_short_tokens(self):
+    def test_filters_short_tokens_and_stopwords(self):
         tokens = _tokenize("a an the AES")
         assert "aes" in tokens
         assert "a" not in tokens  # length 1, filtered
-        assert "an" in tokens     # length 2, kept
+        assert "an" not in tokens  # stopword: question words must not dominate BM25
+        assert "the" not in tokens
+
+    def test_keeps_technical_tokens(self):
+        tokens = _tokenize('How is "JWT" signed with HS256 or RS256 on page 12?')
+        assert tokens == ["jwt", "signed", "hs256", "rs256", "page", "12"]
 
     def test_empty_string_returns_empty(self):
         assert _tokenize("") == []

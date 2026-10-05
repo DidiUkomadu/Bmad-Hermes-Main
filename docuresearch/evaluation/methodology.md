@@ -116,6 +116,21 @@ unsupported by the retrieved passages.
 - The evaluation runner should flag specific claims that are unsupported,
   not just produce a binary score.
 
+**Implementation (LLM judge, `evaluation/judge.py`):**
+- A judge model splits each answer into atomic claims and labels each one
+  *supported* (it must name a retrieved passage ID that supports it),
+  *labelled inference*, or *unsupported*. It is told to ignore outside
+  knowledge. Statements that the documents lack information are not claims;
+  a *false* statement of that kind (the passage was retrieved) is unsupported.
+- Each unsupported claim is reported with the judge's reason.
+- **Citation support** is reported alongside gold-based citation correctness
+  (§2.3): the fraction of an answer's citations whose passage supports at
+  least one claim. It does not depend on the gold list, so a correct citation
+  of a passage the curator did not list is not penalised.
+- Caveat: when the judge is the same model as the generator it may be lenient.
+  Use a different judge model (`DOCURESEARCH_JUDGE_MODEL`) where possible and
+  spot-check the listed unsupported claims.
+
 ### 2.5 Unsupported-Answer / Hallucination Rate
 
 **Definition:** The rate at which the system produces an answer containing claims

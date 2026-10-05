@@ -65,15 +65,26 @@ Each person signs in with an email and password. Documents and conversations are
 
 Passwords are stored as salted scrypt hashes, and sessions are random tokens of which only a hash is stored. The session cookie is HttpOnly and SameSite=Lax. Repeated failed sign-ins are throttled. Design and decisions: `_bmad-output/planning-artifacts/docuresearch-change-proposal-multi-user.md`.
 
+## Deploy
+
+To let other people use it, run it with Docker behind HTTPS:
+
+```bash
+DOMAIN=docs.example.com docker compose up -d --build
+```
+
+See [docs/deployment.md](docs/deployment.md) for requirements, configuration, backups, upgrades and limits.
+
 ## Test and evaluate
 
 ```bash
 pytest -q        # unit and integration tests; no network or model downloads
 ruff check .
 python -m evaluation.pipeline_system --label baseline   # needs an LLM configured
+python -m evaluation.pipeline_system --questions q-101,q-102 --no-judge   # subset, no judge
 ```
 
-The evaluation dataset (`evaluation/dataset/`) has questions with gold answers and gold passages. It covers single-source, multi-passage, partial, insufficient and conflicting evidence. See `evaluation/methodology.md` for how each metric is scored.
+The evaluation dataset (`evaluation/dataset/`) has questions with gold answers and gold passages. It covers single-source, multi-passage, partial, insufficient and conflicting evidence. See `evaluation/methodology.md` for how each metric is scored. Each answer is checked claim by claim by an LLM judge, which reports faithfulness, the hallucination rate and every unsupported claim. A full judged run uses two model requests per question, so mind free-tier daily limits.
 
 ## Scope
 

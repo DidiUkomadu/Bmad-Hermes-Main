@@ -14,16 +14,19 @@ from __future__ import annotations
 import argparse
 import dataclasses
 import logging
+import os
 import sys
 import tempfile
 from pathlib import Path
 from typing import Any
 
 from app.config import Settings
+from app.generation.openai_compat import OpenAICompatibleLLM
 from app.generation.prompt import RetrievedContext
 from app.main import _build_pipeline
 from app.pipeline import GenerationError, ResearchPipeline
 from app.store.schema import get_connection, get_passage, set_db_path
+from evaluation.judge import FaithfulnessJudge
 from evaluation.runner import DATASET_DIR, EvaluationRunner, SystemInterface
 
 GENERATION_FAILED_PREFIX = "GENERATION FAILED:"
@@ -108,6 +111,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--label", default="pipeline", help="Label for the results file")
     parser.add_argument("--no-save", action="store_true", help="Do not write a results file")
     parser.add_argument(
+        "--no-judge",
+        action="store_true",
+        help="Skip the faithfulness judge (halves model requests; faithfulness shows N/A)",
+    )
+    parser.add_argument(
         "--questions",
         help="Comma-separated question IDs to run (default: all), e.g. q-001,q-002",
     )
@@ -125,6 +133,15 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 2
     print(f"Model: {settings.llm.model} at {settings.llm.base_url}")
+    judge_llm = None
+    if not args.no_judge:
+        judge_model = os.environ.get("DOCURESEARCH_JUDGE_MODEL") or settings.llm.model
+        judge_llm = OpenAICompatibleLLM(
+            settings.llm.base_url, judge_model, settings.llm.api_key,
+            settings.llm.timeout_seconds,
+        )
+        note = "" if judge_model != settings.llm.model else " (same model as answers)"
+        print(f"Judge: {judge_model}{note}")
 
     with tempfile.TemporaryDirectory() as tmp:
         db_path = Path(tmp) / "eval.db"
@@ -135,7 +152,9 @@ def main(argv: list[str] | None = None) -> int:
                 info = pipeline.ingest(doc)
                 print(f"Ingested {info['document_name']}: {info['passage_count']} passages")
 
-        runner = EvaluationRunner()
+        runner = EvaluationRunner(
+            judge=FaithfulnessJudge(judge_llm) if judge_llm else None
+        )
         questions = runner.load_questions()
         if args.questions:
             wanted = {q.strip() for q in args.questions.split(",") if q.strip()}
@@ -148,6 +167,8 @@ def main(argv: list[str] | None = None) -> int:
             results = runner.run(questions, system=PipelineSystem(pipeline, db_path))
         finally:
             llm.close()
+            if judge_llm:
+                judge_llm.close()
 
     print(runner.report(results))
     failures = [r for r in results if r.system_answer.startswith(GENERATION_FAILED_PREFIX)]
@@ -156,7 +177,8 @@ def main(argv: list[str] | None = None) -> int:
             f"WARNING: {len(failures)}/{len(results)} questions failed generation "
             f"({', '.join(r.question_id for r in failures)}); metrics above are unreliable."
         )
-    print("Answer faithfulness is not yet measured for LLM answers (reported as N/A).")
+    if judge_llm is None:
+        print("Faithfulness not judged (--no-judge): reported as N/A.")
     if not args.no_save:
         print(f"Results saved to {runner.save_results(results, label=args.label)}")
     return 1 if failures else 0

@@ -1,0 +1,39 @@
+# DocuResearch behind Caddy, which obtains and renews HTTPS certificates automatically.
+#
+#   DOMAIN=docs.example.com docker compose up -d --build
+#
+# The app container is not published to the host; only Caddy (80/443) is.
+# See docs/deployment.md.
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env                      # DOCURESEARCH_LLM_* (and the API key)
+    environment:
+      DOCURESEARCH_COOKIE_SECURE: "true"  # cookies only over HTTPS
+      DOCURESEARCH_ALLOW_REGISTRATION: "${ALLOW_REGISTRATION:-true}"
+    volumes:
+      - docuresearch-data:/data          # SQLite database: documents, accounts, conversations
+    expose:
+      - "8000"
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: "${DOMAIN:?Set DOMAIN to the public hostname, e.g. DOMAIN=docs.example.com}"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data                 # certificates
+      - caddy-config:/config
+
+volumes:
+  docuresearch-data:
+  caddy-data:
+  caddy-config:

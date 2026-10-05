@@ -31,6 +31,7 @@ from app.store.schema import (
     get_connection,
     set_db_path,
 )
+from evaluation.judge import FaithfulnessJudge
 from evaluation.schema import (
     EvaluationQuestion,
     EvaluationResult,
@@ -309,10 +310,19 @@ class EvaluationRunner:
         self,
         questions_path: Path = QUESTIONS_FILE,
         results_dir: Path = RESULTS_DIR,
+        judge: FaithfulnessJudge | None = None,
     ):
+        """
+        Args:
+            judge: Optional LLM judge. When given, every generated answer is
+                checked claim by claim for faithfulness and citation support
+                (methodology §2.3–2.5); without it, LLM answers report
+                faithfulness as N/A.
+        """
         self.questions_path = questions_path
         self.results_dir = results_dir
         self.results_dir.mkdir(parents=True, exist_ok=True)
+        self.judge = judge
 
     def load_questions(self) -> list[EvaluationQuestion]:
         """Load all questions from the dataset JSON file."""
@@ -491,23 +501,47 @@ class EvaluationRunner:
     ) -> None:
         """Determine if the answer is faithful to retrieved passages.
 
-        Only systems that build answers verbatim from retrieved passages
+        Systems that build answers verbatim from retrieved passages
         (``answers_are_extractive = True``, e.g. the StoreBackedSystem
-        placeholder) are faithful by construction. For LLM-generated answers
-        faithfulness is not yet measured and is recorded as None rather than
-        assumed — the report then omits it instead of claiming 100%.
+        placeholder) are faithful by construction. LLM answers are checked by
+        the judge when one is configured; otherwise faithfulness is recorded as
+        None rather than assumed, and the report omits it.
         """
         if getattr(system, "answers_are_extractive", False):
             result.answer_faithful = True
-        else:
+            return
+        if self.judge is None or result.system_evidence_quality is None:
+            # No judge, or generation failed (nothing to judge).
             result.answer_faithful = None
+            return
+
+        verdict = self.judge.judge(
+            question.text,
+            result.system_answer,
+            retrieved,
+            [c.get("passage_id", "") for c in result.system_citations],
+        )
+        result.answer_faithful = verdict.faithful
+        result.judge_error = verdict.error
+        if verdict.error is None:
+            result.claims_total = verdict.claims_total
+            result.claims_supported = verdict.claims_supported
+            result.unsupported_claims = verdict.unsupported_claims
+            result.citation_support = verdict.citation_support
 
     def _compute_abstention(
         self,
         result: EvaluationResult,
         question: EvaluationQuestion,
     ) -> None:
-        """Evaluate whether the abstention decision was correct."""
+        """Evaluate whether the abstention decision was correct.
+
+        A failed generation (no evidence quality) made no decision, so it is
+        N/A rather than counted as a correct "did not abstain".
+        """
+        if result.system_evidence_quality is None:
+            result.abstention_correct = None
+            return
         if question.type == QuestionType.INSUFFICIENT_EVIDENCE:
             # Should abstain
             result.abstention_correct = result.system_abstention
@@ -572,6 +606,8 @@ class EvaluationRunner:
         lines.append("-" * 70)
         for r in results:
             lines.append(r.summary_line())
+            for claim in r.unsupported_claims:
+                lines.append(f"  UNSUPPORTED: {claim}")
             lines.append(f"  Answer: {r.system_answer[:120]}...")
             lines.append(f"  Citations: {len(r.system_citations)}")
             lines.append(f"  Evidence: {r.system_evidence_quality}")
@@ -601,10 +637,26 @@ class EvaluationRunner:
             mean = sum(cit_correctness) / len(cit_correctness)
             lines.append(f"  Citation Correctness: mean={mean:.3f}")
 
-        # Faithfulness
+        # Citation support (judge): does each cited passage support a claim?
+        support = [r.citation_support for r in results if r.citation_support is not None]
+        if support:
+            lines.append(f"  Citation Support:     mean={sum(support) / len(support):.3f}")
+
+        # Faithfulness and hallucination (methodology §2.4–2.5)
         faithful = [r.answer_faithful for r in results if r.answer_faithful is not None]
         if faithful:
             lines.append(f"  Answer Faithfulness:  {_rate(faithful)}")
+            lines.append(f"  Hallucination Rate:   {_rate([not f for f in faithful])} of answers")
+        claims = [r for r in results if r.claims_total]
+        if claims:
+            total = sum(r.claims_total for r in claims)
+            unsupported = total - sum(r.claims_supported for r in claims)
+            lines.append(
+                f"  Unsupported Claims:   {unsupported / total:.1%} ({unsupported}/{total} claims)"
+            )
+        judge_errors = [r for r in results if r.judge_error]
+        if judge_errors:
+            lines.append(f"  Judge errors:         {len(judge_errors)} answers not judged")
 
         # Abstention accuracy
         abstentions = [r.abstention_correct for r in results if r.abstention_correct is not None]

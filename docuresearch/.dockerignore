@@ -1,0 +1,17 @@
+# Never send secrets or local data into the image.
+.env
+.env.*
+config.toml
+data/
+*.db
+
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+tests/
+evaluation/
+docs/
+README.md

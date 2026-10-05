@@ -19,7 +19,10 @@
 - **Excluded from MVP:** Billing, enterprise administration, roles and permissions, shared workspaces, OAuth / single sign-on, email-based password reset
 
 ## Deployment
-- **Local-first** for MVP; deployment comes later
+- **Local-first**, with a production path: Docker + docker compose with Caddy (automatic HTTPS). See `docuresearch/docs/deployment.md`.
+
+## Status
+- **MVP complete (Epics 0–8).** Story status: `_bmad-output/implementation-artifacts/sprint-status.yaml`. Deviations from the plan, and why: `_bmad-output/implementation-artifacts/docuresearch-implementation-notes.md`.
 
 ## BMad Output Structure
 - `_bmad-output/planning-artifacts/` — PRD, architecture, epics, stories

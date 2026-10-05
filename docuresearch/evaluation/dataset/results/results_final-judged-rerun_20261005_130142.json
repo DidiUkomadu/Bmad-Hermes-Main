@@ -1,0 +1,169 @@
+{
+  "label": "final-judged-rerun",
+  "timestamp": "20261005_130142",
+  "run_timestamp": "2026-10-05T12:55:58",
+  "question_count": 5,
+  "results": [
+    {
+      "question_id": "q-105",
+      "system_answer": "Every conforming JWT implementation must support the HMAC SHA-256 (\"HS256\") MAC algorithm and the \"none\" algorithm (indicating an unsecured JWT).",
+      "system_citations": [
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:117:chunk:122",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:117:chunk:122",
+          "excerpt": "Of the signature and MAC algorithms specified in JSON Web Algorithms\n   [JWA], only HMAC SHA-256 (\"HS256\") and \"none\" MUST be implemented by\n   conforming JWT implementations.  It is RECOMMENDED that\n   implementations also support RSASSA-PKCS1-v1_5 with the SHA-256 hash\n   algorithm (\"RS256\") and ECDSA using the P-256 curve and the SHA-256\n   hash algorithm (\"ES256\").  Support for other algorithms and key sizes\n   is OPTIONAL."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "Passage 1 directly states that of the signature and MAC algorithms specified in JWA, only HMAC SHA-256 (\"HS256\") and \"none\" MUST be implemented by conforming JWT implementations. This fully answers the question with no ambiguity.",
+      "system_abstention": false,
+      "retrieval_precision": 0.05,
+      "retrieval_recall": 1.0,
+      "citation_correctness": 1.0,
+      "answer_faithful": true,
+      "claims_total": 2,
+      "claims_supported": 2,
+      "unsupported_claims": [],
+      "citation_support": 1.0,
+      "judge_error": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.08295130100032111,
+      "generation_latency_s": 9.00237018100006,
+      "total_latency_s": 9.085322882000128,
+      "run_timestamp": "2026-10-05T12:55:58",
+      "notes": ""
+    },
+    {
+      "question_id": "q-111",
+      "system_answer": "The JWT specification (RFC 7519) defines an 'exp' claim to indicate the expiration time after which the JWT must not be accepted, but it does not prescribe any specific length of time for how long a JWT should remain valid; the validity period is determined by the application.",
+      "system_citations": [
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:60:chunk:65",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:60:chunk:65",
+          "excerpt": "4.1.4.  \"exp\" (Expiration Time) Claim\nThe \"exp\" (expiration time) claim identifies the expiration time on\n   or after which the JWT MUST NOT be accepted for processing.  The\n   processing of the \"exp\" claim requires that the current date/time\n   MUST be before the expiration date/time listed in the \"exp\" claim."
+        },
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:98:chunk:103",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:98:chunk:103",
+          "excerpt": "7.2.  Validating a JWT\nWhen validating a JWT, the following steps are performed.  The order\n   of the steps is not significant in cases where there are no\n   dependencies between the inputs and outputs of the steps.  If any of\n   the listed steps fail, then the JWT MUST be rejected -- that is,\n   treated by the application as an invalid input."
+        }
+      ],
+      "system_evidence_quality": "sufficient",
+      "system_evidence_narrative": "The retrieved passages define the expiration claim and validation steps but do not mention any recommended validity duration, indicating that the specification leaves the lifetime to the application.",
+      "system_abstention": false,
+      "retrieval_precision": 0.05,
+      "retrieval_recall": 0.5,
+      "citation_correctness": 0.5,
+      "answer_faithful": true,
+      "claims_total": 3,
+      "claims_supported": 3,
+      "unsupported_claims": [],
+      "citation_support": 0.5,
+      "judge_error": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.17442799199989167,
+      "generation_latency_s": 17.377749934999883,
+      "total_latency_s": 17.552179727000293,
+      "run_timestamp": "2026-10-05T12:56:37",
+      "notes": ""
+    },
+    {
+      "question_id": "q-112",
+      "system_answer": "The provided passages do not specify a maximum size for a JWT in bytes.",
+      "system_citations": [],
+      "system_evidence_quality": "insufficient",
+      "system_evidence_narrative": "None of the retrieved passages mention a maximum size limit for JWTs; they discuss JWT structure, claims, headers, and nesting but do not provide any size constraints.",
+      "system_abstention": true,
+      "retrieval_precision": null,
+      "retrieval_recall": null,
+      "citation_correctness": null,
+      "answer_faithful": true,
+      "claims_total": 0,
+      "claims_supported": 0,
+      "unsupported_claims": [],
+      "citation_support": null,
+      "judge_error": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.1982962580000276,
+      "generation_latency_s": 164.88055429899987,
+      "total_latency_s": 165.07885207300023,
+      "run_timestamp": "2026-10-05T12:59:35",
+      "notes": ""
+    },
+    {
+      "question_id": "q-113",
+      "system_answer": "The retrieved passages from the JWT specification (RFC 7519) do not contain any recommendations for JWT libraries in Python.",
+      "system_citations": [],
+      "system_evidence_quality": "insufficient",
+      "system_evidence_narrative": "The passages cover JWT header parameters, claims, security considerations, implementation requirements, and other specification details, but none mention or recommend specific JWT libraries for Python.",
+      "system_abstention": true,
+      "retrieval_precision": null,
+      "retrieval_recall": null,
+      "citation_correctness": null,
+      "answer_faithful": false,
+      "claims_total": 1,
+      "claims_supported": 0,
+      "unsupported_claims": [
+        "The retrieved passages from the JWT specification (RFC 7519) do not contain any recommendations for JWT libraries in Python. (No passage mentions Python JWT library recommendations; the claim about absence is not stated or implied by any single passage.)"
+      ],
+      "citation_support": null,
+      "judge_error": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.0926573990000179,
+      "generation_latency_s": 4.78295475699997,
+      "total_latency_s": 4.875613238999904,
+      "run_timestamp": "2026-10-05T12:59:43",
+      "notes": ""
+    },
+    {
+      "question_id": "q-114",
+      "system_answer": "The retrieved passages from RFC\u202f7519 do not describe any mechanism for revoking a JWT before its expiration time. They cover the expiration ('exp') claim, the 'jti' claim (which can be used to prevent replay), and the validation steps, but none mention revocation, blacklisting, or any method to invalidate a JWT prior to its 'exp' value. Therefore, the specification itself does not provide a revocation method; revocation would be an application\u2011specific concern outside the scope of the provided text.",
+      "system_citations": [
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:60:chunk:65",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:60:chunk:65",
+          "excerpt": "4.1.4.  \"exp\" (Expiration Time) Claim\nThe \"exp\" (expiration time) claim identifies the expiration time on\n   or after which the JWT MUST NOT be accepted for processing.  The\n   processing of the \"exp\" claim requires that the current date/time\n   MUST be before the expiration date/time listed in the \"exp\" claim."
+        },
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:64:chunk:69",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:64:chunk:69",
+          "excerpt": "4.1.7.  \"jti\" (JWT ID) Claim\nThe \"jti\" (JWT ID) claim provides a unique identifier for the JWT.\n   The identifier value MUST be assigned in a manner that ensures that\n   there is a negligible probability that the same value will be\n   accidentally assigned to a different data object; if the application\n   uses multiple issuers, collisions MUST be prevented among values\n   produced by different issuers as well.  The \"jti\" claim can be used\n   to prevent the JWT from being replayed.  The \"jti\" value is a case-\n   sensitive string.  Use of this claim is OPTIONAL."
+        },
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:98:chunk:103",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:98:chunk:103",
+          "excerpt": "7.2.  Validating a JWT\nWhen validating a JWT, the following steps are performed.  The order\n   of the steps is not significant in cases where there are no\n   dependencies between the inputs and outputs of the steps.  If any of\n   the listed steps fail, then the JWT MUST be rejected -- that is,\n   treated by the application as an invalid input."
+        }
+      ],
+      "system_evidence_quality": "insufficient",
+      "system_evidence_narrative": "The passages discuss expiration, validation, and optional identifiers but contain no information about revoking a JWT before its expiration. Consequently, there is insufficient evidence to answer the question definitively.",
+      "system_abstention": true,
+      "retrieval_precision": null,
+      "retrieval_recall": null,
+      "citation_correctness": 0.0,
+      "answer_faithful": true,
+      "claims_total": 7,
+      "claims_supported": 7,
+      "unsupported_claims": [],
+      "citation_support": 1.0,
+      "judge_error": null,
+      "abstention_correct": true,
+      "conflict_handled": null,
+      "retrieval_latency_s": 0.18119495500013727,
+      "generation_latency_s": 28.74324775599962,
+      "total_latency_s": 28.924444050999682,
+      "run_timestamp": "2026-10-05T13:00:41",
+      "notes": ""
+    }
+  ]
+}

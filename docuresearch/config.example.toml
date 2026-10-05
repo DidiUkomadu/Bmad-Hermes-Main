@@ -9,8 +9,9 @@ db_path = "data/storage/docuresearch.db"
 [retrieval]
 embedding_model = "all-MiniLM-L6-v2"
 max_candidates = 20
-semantic_weight = 0.5
-keyword_weight = 0.5
+# Tuned on the evaluation dataset; see app/config.py.
+semantic_weight = 0.7
+keyword_weight = 0.3
 
 [conversation]
 # Recent turns (question + answer pairs) given to the model as context. All turns are kept.

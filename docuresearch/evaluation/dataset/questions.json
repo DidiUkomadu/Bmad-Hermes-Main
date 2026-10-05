@@ -399,6 +399,16 @@
           "equivalent_passage_ids": [
             "sample-spec-md-b0f9ddb6:Sample Technical Document:chunk:0"
           ]
+        },
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:3:chunk:2",
+          "document_id": "sample-spec-pdf-d58d38e8",
+          "document_name": "sample_spec.pdf",
+          "location": "page:3",
+          "claim": "Revision history: Version 1.0 - 2019-03-15: Initial publication.",
+          "equivalent_passage_ids": [
+            "sample-spec-md-b0f9ddb6:Sample Technical Document / Revision History:chunk:5"
+          ]
         }
       ],
       "tags": [
@@ -441,9 +451,20 @@
     {
       "id": "q-019",
       "text": "What is the exact key rotation procedure for the Alpha Protocol?",
-      "type": "insufficient_evidence",
-      "gold_answer": "The documents state that the encryption key must be rotated every 90 days and that each rotation requires generating a new key pair and securely distributing the public key to all authorized recipients. However, the documents do not describe the specific procedure for generating the key pair, the mechanism for secure distribution, or how authorized recipients are identified. A complete answer to the exact procedure is not possible from these documents alone.",
-      "gold_passages": [],
+      "type": "partial_evidence",
+      "gold_answer": "The documents describe only part of the procedure: the encryption key must be rotated every 90 days, and each rotation requires generating a new key pair and securely distributing the public key to all authorized recipients. They do not give an exact step-by-step procedure (for example, how the public key is distributed or how old keys are retired).",
+      "gold_passages": [
+        {
+          "passage_id": "sample-spec-pdf-d58d38e8:page:1:chunk:0",
+          "document_id": "sample-spec-pdf-d58d38e8",
+          "document_name": "sample_spec.pdf",
+          "location": "page:1",
+          "claim": "Rotation every 90 days; each rotation generates a new key pair and securely distributes the public key.",
+          "equivalent_passage_ids": [
+            "sample-spec-md-b0f9ddb6:Sample Technical Document / Security Requirements:chunk:1"
+          ]
+        }
+      ],
       "closest_passage": {
         "passage_id": "sample-spec-pdf-d58d38e8:page:2:chunk:1",
         "document_id": "sample-spec-pdf-d58d38e8",
@@ -452,9 +473,9 @@
         "claim": "Key rotation requirements: every 90 days, generate new key pair, distribute public key."
       },
       "tags": [
-        "security",
-        "insufficient-evidence",
-        "abstention-test"
+        "abstention-test",
+        "partial-evidence",
+        "security"
       ]
     },
     {
@@ -543,6 +564,298 @@
         "conflicting-evidence",
         "release-date"
       ]
+    },
+    {
+      "id": "q-101",
+      "text": "How is \"JWT\" meant to be pronounced?",
+      "type": "single_source",
+      "gold_answer": "The suggested pronunciation of JWT is the same as the English word \"jot\".",
+      "gold_passages": [
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:16:chunk:21",
+          "document_id": "rfc7519-txt-74f4edb2",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:16",
+          "claim": "Pronounced like the English word \"jot\"."
+        }
+      ],
+      "tags": [
+        "rfc",
+        "definition"
+      ]
+    },
+    {
+      "id": "q-102",
+      "text": "What does the \"exp\" claim identify, and how must the current time relate to it?",
+      "type": "single_source",
+      "gold_answer": "The \"exp\" (expiration time) claim identifies the time on or after which the JWT must not be accepted for processing; the current date/time must be before the expiration time.",
+      "gold_passages": [
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:60:chunk:65",
+          "document_id": "rfc7519-txt-74f4edb2",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:60",
+          "claim": "\"exp\" identifies the expiration time on or after which the JWT MUST NOT be accepted; current time must be before it."
+        }
+      ],
+      "tags": [
+        "rfc",
+        "claims"
+      ]
+    },
+    {
+      "id": "q-103",
+      "text": "Is the \"exp\" claim mandatory, and what kind of value must it contain?",
+      "type": "multi_passage",
+      "gold_answer": "No. Use of the \"exp\" claim is OPTIONAL. Its value must be a number containing a NumericDate value (implementers may allow a small leeway, usually no more than a few minutes, for clock skew).",
+      "gold_passages": [
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:60:chunk:65",
+          "document_id": "rfc7519-txt-74f4edb2",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:60",
+          "claim": "\"exp\" identifies the expiration time on or after which the JWT MUST NOT be accepted; current time must be before it."
+        },
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:61:chunk:66",
+          "document_id": "rfc7519-txt-74f4edb2",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:61",
+          "claim": "Small leeway (usually no more than a few minutes) for clock skew; value MUST be a NumericDate; use is OPTIONAL."
+        }
+      ],
+      "tags": [
+        "rfc",
+        "claims",
+        "page-break"
+      ]
+    },
+    {
+      "id": "q-104",
+      "text": "What can the \"jti\" claim be used to prevent?",
+      "type": "single_source",
+      "gold_answer": "The \"jti\" (JWT ID) claim provides a unique identifier for the JWT and can be used to prevent the JWT from being replayed.",
+      "gold_passages": [
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:64:chunk:69",
+          "document_id": "rfc7519-txt-74f4edb2",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:64",
+          "claim": "\"jti\" is a unique identifier that can be used to prevent replay."
+        }
+      ],
+      "tags": [
+        "rfc",
+        "claims"
+      ]
+    },
+    {
+      "id": "q-105",
+      "text": "Which signature or MAC algorithms must every conforming JWT implementation support?",
+      "type": "single_source",
+      "gold_answer": "Only HMAC SHA-256 (\"HS256\") and \"none\" must be implemented. RS256 and ES256 are recommended; other algorithms are optional.",
+      "gold_passages": [
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:117:chunk:122",
+          "document_id": "rfc7519-txt-74f4edb2",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:117",
+          "claim": "Only HS256 and \"none\" MUST be implemented; RS256 and ES256 RECOMMENDED."
+        }
+      ],
+      "tags": [
+        "rfc",
+        "implementation"
+      ]
+    },
+    {
+      "id": "q-106",
+      "text": "What value is recommended for the \"typ\" header parameter, and how should it be written?",
+      "type": "single_source",
+      "gold_answer": "If present, it is recommended that \"typ\" be \"JWT\", always spelled in uppercase for compatibility with legacy implementations. Use of the parameter is optional.",
+      "gold_passages": [
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:70:chunk:75",
+          "document_id": "rfc7519-txt-74f4edb2",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:70",
+          "claim": "Recommended \"typ\" value \"JWT\", uppercase; OPTIONAL."
+        }
+      ],
+      "tags": [
+        "rfc",
+        "header"
+      ]
+    },
+    {
+      "id": "q-107",
+      "text": "What \"alg\" header value does an Unsecured JWT use?",
+      "type": "single_source",
+      "gold_answer": "An Unsecured JWT uses the \"alg\" Header Parameter value \"none\", with the empty string as its JWS Signature value.",
+      "gold_passages": [
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:76:chunk:81",
+          "document_id": "rfc7519-txt-74f4edb2",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:76",
+          "claim": "Unsecured JWT uses \"alg\" value \"none\" and an empty signature.",
+          "equivalent_passage_ids": [
+            "rfc7519-txt-74f4edb2:paragraph:78:chunk:83"
+          ]
+        }
+      ],
+      "tags": [
+        "rfc",
+        "unsecured"
+      ]
+    },
+    {
+      "id": "q-108",
+      "text": "What media type does RFC 7519 register for JWTs?",
+      "type": "single_source",
+      "gold_answer": "It registers the \"application/jwt\" media type.",
+      "gold_passages": [
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:144:chunk:149",
+          "document_id": "rfc7519-txt-74f4edb2",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:144",
+          "claim": "Registers \"application/jwt\".",
+          "equivalent_passage_ids": [
+            "rfc7519-txt-74f4edb2:paragraph:145:chunk:150"
+          ]
+        }
+      ],
+      "tags": [
+        "rfc",
+        "iana"
+      ]
+    },
+    {
+      "id": "q-109",
+      "text": "Which registered claims represent times, and what format do their values use?",
+      "type": "multi_passage",
+      "gold_answer": "The \"exp\" (expiration time), \"nbf\" (not before) and \"iat\" (issued at) claims. Each value must be a NumericDate: a JSON number of seconds since 1970-01-01T00:00:00Z UTC, ignoring leap seconds.",
+      "gold_passages": [
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:61:chunk:66",
+          "document_id": "rfc7519-txt-74f4edb2",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:61",
+          "claim": "Small leeway (usually no more than a few minutes) for clock skew; value MUST be a NumericDate; use is OPTIONAL."
+        },
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:62:chunk:67",
+          "document_id": "rfc7519-txt-74f4edb2",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:62",
+          "claim": "\"nbf\" value MUST be a NumericDate."
+        },
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:63:chunk:68",
+          "document_id": "rfc7519-txt-74f4edb2",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:63",
+          "claim": "\"iat\" value MUST be a NumericDate."
+        },
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:31:chunk:36",
+          "document_id": "rfc7519-txt-74f4edb2",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:31",
+          "claim": "NumericDate: JSON number of seconds since 1970-01-01T00:00:00Z UTC, ignoring leap seconds."
+        }
+      ],
+      "tags": [
+        "rfc",
+        "claims",
+        "multi-passage"
+      ]
+    },
+    {
+      "id": "q-110",
+      "text": "What is a NumericDate in the JWT specification?",
+      "type": "single_source",
+      "gold_answer": "A JSON numeric value representing the number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds; non-integer values can be represented.",
+      "gold_passages": [
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:31:chunk:36",
+          "document_id": "rfc7519-txt-74f4edb2",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:31",
+          "claim": "NumericDate: JSON number of seconds since 1970-01-01T00:00:00Z UTC, ignoring leap seconds."
+        }
+      ],
+      "tags": [
+        "rfc",
+        "definition"
+      ]
+    },
+    {
+      "id": "q-111",
+      "text": "How long should a JWT remain valid before it expires?",
+      "type": "partial_evidence",
+      "gold_answer": "The specification does not recommend a token lifetime. It only defines the \"exp\" claim (the time after which the JWT must not be accepted) and says implementers may allow a small leeway, usually no more than a few minutes, for clock skew. Choosing the lifetime is left to the application.",
+      "gold_passages": [
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:60:chunk:65",
+          "document_id": "rfc7519-txt-74f4edb2",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:60",
+          "claim": "\"exp\" identifies the expiration time on or after which the JWT MUST NOT be accepted; current time must be before it."
+        },
+        {
+          "passage_id": "rfc7519-txt-74f4edb2:paragraph:61:chunk:66",
+          "document_id": "rfc7519-txt-74f4edb2",
+          "document_name": "rfc7519.txt",
+          "location": "paragraph:61",
+          "claim": "Small leeway (usually no more than a few minutes) for clock skew; value MUST be a NumericDate; use is OPTIONAL."
+        }
+      ],
+      "tags": [
+        "rfc",
+        "partial-evidence"
+      ]
+    },
+    {
+      "id": "q-112",
+      "text": "What is the maximum size of a JWT in bytes?",
+      "type": "insufficient_evidence",
+      "gold_answer": "The documents do not specify a maximum JWT size.",
+      "gold_passages": [],
+      "tags": [
+        "rfc",
+        "insufficient-evidence"
+      ]
+    },
+    {
+      "id": "q-113",
+      "text": "Which JWT libraries does the specification recommend for Python?",
+      "type": "insufficient_evidence",
+      "gold_answer": "The documents do not recommend any libraries or programming languages.",
+      "gold_passages": [],
+      "tags": [
+        "rfc",
+        "insufficient-evidence"
+      ]
+    },
+    {
+      "id": "q-114",
+      "text": "How can a JWT be revoked before its expiration time?",
+      "type": "insufficient_evidence",
+      "gold_answer": "The documents do not describe a revocation mechanism. The closest related text is that the \"jti\" claim can be used to prevent a JWT from being replayed.",
+      "gold_passages": [],
+      "tags": [
+        "rfc",
+        "insufficient-evidence"
+      ],
+      "closest_passage": {
+        "passage_id": "rfc7519-txt-74f4edb2:paragraph:64:chunk:69",
+        "document_id": "rfc7519-txt-74f4edb2",
+        "document_name": "rfc7519.txt",
+        "location": "paragraph:64",
+        "claim": "Closest: \"jti\" can be used to prevent replay (not revocation)."
+      }
     }
   ]
 }
