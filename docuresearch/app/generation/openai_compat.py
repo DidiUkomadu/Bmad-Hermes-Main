@@ -18,12 +18,16 @@ the same output contract.
 
 from __future__ import annotations
 
+import logging
 import os
 import time
+from datetime import datetime
 from typing import Any
 
 import httpx
 
+from app.generation import allowance as allowance_clock
+from app.generation.allowance import ProviderAllowance, next_utc_midnight, parse_reset
 from app.generation.interface import LLMResponse
 from app.generation.schema import parse_llm_output
 
@@ -34,6 +38,11 @@ _SYSTEM_MESSAGE = (
 
 
 _MAX_RETRY_DELAY_SECONDS = 30.0
+
+# OpenRouter's wording for its free daily allowance being used up.
+_DAILY_CAP_TEXT = "free-models-per-day"
+
+logger = logging.getLogger(__name__)
 
 
 class ProviderError(httpx.HTTPError):
@@ -74,6 +83,54 @@ def _provider_message(resp: httpx.Response) -> str:
     return str(raw or error.get("message") or "unknown error")[:300]
 
 
+class DailyCapError(ProviderError):
+    """The provider's daily allowance is used up until *until* (Story 9.2)."""
+
+    def __init__(self, until: datetime, message: str) -> None:
+        super().__init__(429, message)
+        self.until = until
+
+
+def _rate_limit_headers(resp: httpx.Response) -> dict[str, str]:
+    """Rate-limit headers from the HTTP response and the body's ``error.metadata.headers``.
+
+    Keys are lower-cased; HTTP headers win over the body's copy.
+    """
+    headers: dict[str, str] = {}
+    error = _error_body(resp) or {}
+    metadata = error.get("metadata")
+    body_headers = metadata.get("headers") if isinstance(metadata, dict) else None
+    if isinstance(body_headers, dict):
+        headers.update({str(k).lower(): str(v) for k, v in body_headers.items()})
+    for name in ("x-ratelimit-remaining", "x-ratelimit-reset"):
+        if name in resp.headers:
+            headers[name] = resp.headers[name]
+    return headers
+
+
+def _is_zero(value: str | None) -> bool:
+    try:
+        return value is not None and float(value) == 0
+    except ValueError:
+        return False
+
+
+def _daily_cap_until(resp: httpx.Response, now: datetime) -> datetime | None:
+    """For a 429: when the daily allowance resets, or None for an ordinary busy 429.
+
+    Daily when the body says ``free-models-per-day`` (reset falls back to the
+    next 00:00 UTC), or when ``X-RateLimit-Remaining`` is 0 together with a
+    usable ``X-RateLimit-Reset``.
+    """
+    headers = _rate_limit_headers(resp)
+    reset = parse_reset(headers.get("x-ratelimit-reset"), now)
+    if _DAILY_CAP_TEXT in resp.text:
+        return reset or next_utc_midnight(now)
+    if _is_zero(headers.get("x-ratelimit-remaining")) and reset is not None:
+        return reset
+    return None
+
+
 def _retry_after_seconds(resp: httpx.Response) -> float | None:
     try:
         return max(0.0, float(resp.headers["retry-after"]))
@@ -96,8 +153,12 @@ class OpenAICompatibleLLM:
         temperature: Sampling temperature. Defaults to 0 for reproducible
             evaluation runs.
         client: Optional preconfigured ``httpx.Client`` (used by tests).
-        max_retries: Retries for 429 and 5xx responses.
+        max_retries: Retries for 429 and 5xx responses (never for a daily-cap 429).
         backoff_seconds: First retry delay; doubles on each retry.
+
+    Attributes:
+        allowance: In-memory record of the provider's daily allowance being
+            used up (Story 9.2). While exhausted, ``generate`` makes no call.
     """
 
     def __init__(
@@ -121,6 +182,7 @@ class OpenAICompatibleLLM:
         self._headers = headers
         self._max_retries = max_retries
         self._backoff_seconds = backoff_seconds
+        self.allowance = ProviderAllowance()
 
     def _post_with_retry(self, payload: dict[str, Any]) -> httpx.Response:
         """POST, retrying rate limits (429) and server errors (5xx) with backoff.
@@ -133,6 +195,9 @@ class OpenAICompatibleLLM:
         Some gateways (e.g. OpenRouter) report provider errors inside a 200
         response as ``{"error": {"code": ..., "message": ...}}``; those are
         treated by their embedded code.
+
+        A daily-cap 429 (see ``_daily_cap_until``) is never retried: it raises
+        ``DailyCapError`` at once.
         """
         for attempt in range(self._max_retries + 1):
             try:
@@ -144,6 +209,10 @@ class OpenAICompatibleLLM:
                 time.sleep(min(self._backoff_seconds * 2**attempt, _MAX_RETRY_DELAY_SECONDS))
                 continue
             status = _effective_status(resp)
+            if status == 429:
+                until = _daily_cap_until(resp, allowance_clock._now())
+                if until is not None:
+                    raise DailyCapError(until, _provider_message(resp))
             retryable = status == 429 or status >= 500
             if not retryable or attempt == self._max_retries:
                 resp.raise_for_status()
@@ -181,7 +250,15 @@ class OpenAICompatibleLLM:
 
         Transport and parse failures are reported via ``parse_error`` with
         ``structured=None``; they are never turned into an answer here.
+
+        While the provider's daily allowance is exhausted no request is sent;
+        that, and the request that discovers it, are reported with
+        ``provider_exhausted_until`` set as well.
         """
+        exhausted_until = self.allowance.exhausted_until()
+        if exhausted_until is not None:
+            return _exhausted_response(exhausted_until, 0.0)
+
         payload = {
             "model": self._model,
             "messages": [
@@ -197,6 +274,13 @@ class OpenAICompatibleLLM:
         try:
             resp = self._post_with_retry(payload)
             raw_text = resp.json()["choices"][0]["message"]["content"] or ""
+        except DailyCapError as exc:
+            self.allowance.mark_exhausted(exc.until)
+            logger.warning(
+                "LLM provider daily allowance exhausted; no calls until %s",
+                exc.until.isoformat(),
+            )
+            return _exhausted_response(exc.until, time.monotonic() - start)
         except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError) as exc:
             return LLMResponse(
                 raw_text="",
@@ -212,3 +296,12 @@ class OpenAICompatibleLLM:
             parse_error=None if structured else "LLM output did not match the answer schema",
             latency_seconds=latency,
         )
+
+
+def _exhausted_response(until: datetime, latency: float) -> LLMResponse:
+    return LLMResponse(
+        raw_text="",
+        parse_error=f"LLM provider daily allowance exhausted until {until.isoformat()}",
+        latency_seconds=latency,
+        provider_exhausted_until=until,
+    )

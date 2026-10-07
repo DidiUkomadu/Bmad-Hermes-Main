@@ -24,10 +24,12 @@ import logging
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, replace
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 from app.chunking.strategy import ChunkingConfig
+from app.generation.allowance import ProviderAllowance
 from app.generation.citation import resolve_citations
 from app.generation.interface import (
     EvidenceQuality,
@@ -70,6 +72,17 @@ class GenerationError(RuntimeError):
 
     Raised instead of fabricating an answer; callers decide how to surface it.
     """
+
+
+class ProviderAllowanceExhausted(GenerationError):  # noqa: N818 — name fixed by the Story 9.2 spec
+    """The LLM provider's daily allowance is used up until *resets_at* (Story 9.2)."""
+
+    def __init__(self, resets_at: datetime) -> None:
+        self.resets_at = resets_at
+        super().__init__(
+            "The demo has used today's free AI allowance. "
+            f"It resets at {resets_at.strftime('%Y-%m-%d %H:%M UTC')}."
+        )
 
 
 @dataclass(frozen=True)
@@ -126,6 +139,11 @@ class ResearchPipeline:
     def db_path(self) -> str:
         """Path to the SQLite content store this pipeline reads and writes."""
         return self._db_path
+
+    @property
+    def llm_allowance(self) -> ProviderAllowance | None:
+        """The LLM's ``ProviderAllowance`` tracker, or None if it has none (e.g. fakes)."""
+        return getattr(self._llm, "allowance", None)
 
     # ------------------------------------------------------------------
     # Ingestion
@@ -279,6 +297,8 @@ class ResearchPipeline:
         propagates unchanged.
 
         Raises:
+            ProviderAllowanceExhausted: if the provider's daily allowance is
+                used up (a ``GenerationError``).
             GenerationError: if the LLM call fails or its output cannot be
                 parsed. No answer is fabricated in that case.
         """
@@ -300,6 +320,9 @@ class ResearchPipeline:
         start = time.monotonic()
         response = self._llm.generate(prompt)
         latency = time.monotonic() - start
+
+        if response.provider_exhausted_until is not None:
+            raise ProviderAllowanceExhausted(response.provider_exhausted_until)
 
         parsed = response.structured
         if parsed is None and response.raw_text:

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import sqlite3
 import time
+from datetime import datetime
 
 from fastapi import APIRouter, Depends
 
@@ -61,12 +62,13 @@ from app.limits import (
     reserve_question,
     usage_summary,
 )
-from app.pipeline import GenerationError, PipelineResult
+from app.pipeline import GenerationError, PipelineResult, ProviderAllowanceExhausted
 from app.store.schema import get_connection, set_db_path
 
 router = APIRouter(tags=["query"])
 
 LIMIT_REACHED = "Daily question limit reached"
+ALLOWANCE_EXHAUSTED = "The demo has used today's free AI allowance"
 
 
 def _limits(state: AppState) -> DailyLimits:
@@ -115,8 +117,30 @@ class _QuestionCounter:
         self.reservation = None
 
 
+def _allowance_detail(resets_at: datetime) -> str:
+    when = resets_at.strftime("%Y-%m-%d %H:%M UTC")
+    return f"AI questions are paused until the provider's allowance resets at {when}."
+
+
+def require_allowance(state: AppState) -> None:
+    """503 while the LLM provider's daily allowance is exhausted (Story 9.2).
+
+    Checked before retrieval and before counting, so nothing is called or counted.
+    """
+    allowance = getattr(state.pipeline, "llm_allowance", None)
+    resets_at = allowance.exhausted_until() if allowance is not None else None
+    if resets_at is not None:
+        raise APIError(503, ALLOWANCE_EXHAUSTED, _allowance_detail(resets_at))
+
+
 def _generation_failed(counter: _QuestionCounter, exc: GenerationError) -> APIError:
+    """Refund the user (Story 9.1 failed-call rule) and map the failure to an API error.
+
+    The request that discovers the provider's daily cap gets 503; others get 502.
+    """
     counter.refund()
+    if isinstance(exc, ProviderAllowanceExhausted):
+        return APIError(503, ALLOWANCE_EXHAUSTED, _allowance_detail(exc.resets_at))
     return APIError(502, "Generation failed", str(exc))
 
 
@@ -157,9 +181,11 @@ def _in_session(
 ) -> tuple[PipelineResult, str]:
     """Answer in a session. ``QuestionLimitReached`` raised by the counter
     hook propagates out of ``ask`` unchanged (no turn recorded) and becomes 429.
+    An exhausted provider allowance gives 503 (Story 9.2).
     """
     require_llm(state)
     require_document(conn, scope.document_id if scope else None, owner_id=user.id)
+    require_allowance(state)
     counter = _QuestionCounter(state, user)
     try:
         turn = ask(
@@ -191,7 +217,8 @@ def query(
 
     With ``session_id`` the turn is recorded in that (user's) session.
     429 when a daily question limit is reached (no model call, no turn
-    recorded); 502 when generation fails.
+    recorded); 503 while the provider's daily AI allowance is used up (no
+    model call, not counted); 502 when generation fails.
     """
     start = time.monotonic()
     if req.session_id:
@@ -205,6 +232,7 @@ def query(
     require_llm(state)
     scope = req.document_scope or DocumentScopeModel()
     require_document(conn, scope.document_id, owner_id=user.id)
+    require_allowance(state)
     counter = _QuestionCounter(state, user)
     try:
         result = state.pipeline.answer(
@@ -313,7 +341,8 @@ def follow_up(
     """Ask a follow-up in one of the user's sessions; history and scope carry over.
 
     429 when a daily question limit is reached (no model call, no turn
-    recorded); 502 when generation fails.
+    recorded); 503 while the provider's daily AI allowance is used up (no
+    model call, not counted); 502 when generation fails.
     """
     start = time.monotonic()
     if get_session(conn, session_id, owner_id=user.id) is None:

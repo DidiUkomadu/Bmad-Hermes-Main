@@ -11,7 +11,7 @@
 # Deviations from the plan: implementation-artifacts/docuresearch-implementation-notes.md
 
 generated: 2026-10-05
-last_updated: 2026-10-07
+last_updated: 2026-10-08
 project: DocuResearch
 project_key: docuresearch
 tracking_system: file-system
@@ -95,7 +95,7 @@ development_status:
   # Epic 9: Public beta on Hugging Face Spaces (sprint change proposal, 2026-10-07)
   epic-9: in-progress
   9-1-daily-question-limits: review
-  9-2-openrouter-daily-cap-handling: backlog
+  9-2-openrouter-daily-cap-handling: review
   9-3-upload-limits: backlog
   9-4-sign-up-protection: backlog
   9-5-privacy-notice-and-demo-banner: backlog

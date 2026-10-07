@@ -23,6 +23,7 @@ Do NOT implement:
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from enum import StrEnum
 from typing import Any, Protocol
 
@@ -105,12 +106,15 @@ class LLMResponse:
         structured: Parsed structured output, or None if parsing failed.
         parse_error: Error description if parsing failed, None otherwise.
         latency_seconds: Wall-clock time for the LLM call.
+        provider_exhausted_until: Set when the provider's daily allowance is
+            used up (Story 9.2): the time it resets. ``parse_error`` is set too.
     """
 
     raw_text: str
     structured: GeneratedAnswer | None = None
     parse_error: str | None = None
     latency_seconds: float = 0.0
+    provider_exhausted_until: datetime | None = None
 
 
 class LLMInterface(Protocol):
