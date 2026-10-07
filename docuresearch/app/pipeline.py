@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import logging
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
@@ -164,18 +165,26 @@ class ResearchPipeline:
         conversation_history: list[ConversationTurn] | None = None,
         retrieval_query: str | None = None,
         owner_id: str | None = None,
+        before_model_call: Callable[[], None] | None = None,
     ) -> PipelineResult:
         """Answer *query*, optionally restricted to one document.
 
         *retrieval_query*, when given, is searched instead of *query* (e.g. a
         follow-up expanded with conversation context); the prompt always
         carries the user's *query* verbatim. *owner_id* restricts the search
-        to that user's documents (see ``retrieve``).
+        to that user's documents (see ``retrieve``). *before_model_call* is
+        passed to ``generate``.
+
+        Raises:
+            GenerationError: if generation fails (see ``generate``).
+            Anything *before_model_call* raises (e.g. ``QuestionLimitReached``)
+            propagates unchanged; the model is not called.
         """
         context = self.retrieve(
             query, document_id, conversation_history, retrieval_query, owner_id=owner_id
         )
-        return PipelineResult(answer=self.generate(context), context=context)
+        answer = self.generate(context, before_model_call=before_model_call)
+        return PipelineResult(answer=answer, context=context)
 
     def retrieve(
         self,
@@ -256,8 +265,18 @@ class ResearchPipeline:
             retrieval_latency_seconds=ranked.retrieval_latency_seconds,
         )
 
-    def generate(self, context: RetrievedContext) -> GeneratedAnswer:
+    def generate(
+        self,
+        context: RetrievedContext,
+        before_model_call: Callable[[], None] | None = None,
+    ) -> GeneratedAnswer:
         """Generate and verify an answer for an already-retrieved context.
+
+        *before_model_call*, when given, is called exactly once, right before
+        the model is called; it is not called when no passages were retrieved
+        (no model call is made then). It may raise to stop the call, e.g. when
+        a daily question limit is reached (Story 9.1); the exception
+        propagates unchanged.
 
         Raises:
             GenerationError: if the LLM call fails or its output cannot be
@@ -273,6 +292,9 @@ class ResearchPipeline:
                 is_abstention=True,
                 generation_latency_seconds=0.0,
             )
+
+        if before_model_call is not None:
+            before_model_call()
 
         prompt = build_prompt(context, self._generation_config)
         start = time.monotonic()

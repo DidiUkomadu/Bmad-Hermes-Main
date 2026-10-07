@@ -14,6 +14,8 @@ Tables:
     users              — id, email (unique, case-insensitive), display_name,
                          password_hash, created_at (Epic 8)
     auth_sessions      — token_hash, user_id (FK, cascade), created_at, expires_at
+    usage_counters     — day (UTC date), scope (user/site/refund), user_id, count
+                         (managed by app.limits.usage, Story 9.1)
 
 Ownership (Epic 8): documents and conversations carry an ``owner_id``. Repository
 functions take an optional ``owner_id``; when given, only that owner's rows are
@@ -153,6 +155,17 @@ def create_schema(conn: sqlite3.Connection) -> None:
     _add_column_if_missing(conn, "conversations", "owner_id", "TEXT")
     conn.execute("CREATE INDEX IF NOT EXISTS idx_documents_owner ON documents(owner_id)")
     conn.execute("CREATE INDEX IF NOT EXISTS idx_conversations_owner ON conversations(owner_id)")
+
+    # Daily question counts (Story 9.1, managed by app.limits.usage)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS usage_counters (
+            day TEXT NOT NULL,
+            scope TEXT NOT NULL,
+            user_id TEXT NOT NULL,
+            count INTEGER NOT NULL,
+            PRIMARY KEY (day, scope, user_id)
+        )
+    """)
 
     conn.commit()
 

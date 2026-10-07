@@ -358,7 +358,7 @@ def test_openapi_matches_contract_and_has_no_confidence(make_client):
         f"{API}/documents/upload", f"{API}/documents", f"{API}/documents/{{document_id}}",
         f"{API}/query", f"{API}/conversation", f"{API}/conversation/{{session_id}}",
         f"{API}/conversation/{{session_id}}/follow-up",
-        f"{API}/citations/{{passage_id}}", f"{API}/health",
+        f"{API}/citations/{{passage_id}}", f"{API}/health", f"{API}/usage",
     }
     assert "confidence" not in json.dumps(spec).lower()
 

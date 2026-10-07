@@ -29,6 +29,7 @@ and call ``ask``.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, replace
 
 from app.citation import resolve_passage
@@ -70,6 +71,7 @@ def ask(
     scope: DocumentScope | None = None,
     max_turns: int = DEFAULT_MAX_TURNS,
     owner_id: str | None = None,
+    before_model_call: Callable[[], None] | None = None,
 ) -> ConversationAnswer:
     """Answer *query* within a conversation and record the turn.
 
@@ -82,11 +84,16 @@ def ask(
         max_turns: How many recent turns are given to the model as context.
         owner_id: The signed-in user. The session must be theirs, and retrieval
             and carried-forward passages are limited to their documents.
+        before_model_call: Passed to ``ResearchPipeline.generate``; called just
+            before the model call (used for daily question limits).
 
     Raises:
         SessionNotFoundError: if *session_id* does not exist.
         ValueError: if *scope* is malformed.
         app.pipeline.GenerationError: if generation fails; no turn is recorded.
+        Anything *before_model_call* raises (e.g.
+        ``app.limits.QuestionLimitReached``) propagates unchanged, and no turn
+        is recorded.
     """
     if scope is not None:
         _validate_scope(scope)
@@ -113,7 +120,10 @@ def ask(
             owner_id=owner_id,
         )
         context = _carry_forward_cited_passages(conn, context, history, document_id, owner_id)
-        result = PipelineResult(answer=pipeline.generate(context), context=context)
+        result = PipelineResult(
+            answer=pipeline.generate(context, before_model_call=before_model_call),
+            context=context,
+        )
 
         turn = add_turn(conn, session.session_id, query, result.answer)
         set_document_scope(conn, session.session_id, effective)

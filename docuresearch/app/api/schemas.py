@@ -164,6 +164,29 @@ class SessionRemovalResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# Usage (Story 9.1)
+# ---------------------------------------------------------------------------
+
+
+class UsageCountModel(BaseModel):
+    used: int = Field(
+        description=(
+            "Questions counted today (UTC). Nothing new is counted while question limits "
+            "are off; counts made earlier the same UTC day still show."
+        )
+    )
+    limit: int | None = Field(description="The daily limit; null means unlimited.")
+    remaining: int | None = Field(description="Questions left today; null means unlimited.")
+
+
+class UsageResponse(BaseModel):
+    day: str = Field(description="The current UTC date, YYYY-MM-DD.")
+    resets_at: datetime = Field(description="When counts reset (the next 00:00 UTC).")
+    user: UsageCountModel = Field(description="The signed-in user's own questions.")
+    site: UsageCountModel = Field(description="Questions from all users together.")
+
+
+# ---------------------------------------------------------------------------
 # Citations (§5.5)
 # ---------------------------------------------------------------------------
 

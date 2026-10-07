@@ -108,7 +108,7 @@ def test_every_non_public_endpoint_requires_sign_in(server):
             assert resp.status_code == 401, f"{method.upper()} {path} -> {resp.status_code}"
             assert resp.json()["error"] == "Not signed in"
             checked += 1
-    assert checked >= 11  # documents, query, conversations, citations, me
+    assert checked >= 12  # documents, query, conversations, citations, me, usage
 
 
 def test_register_sets_secure_session_cookie_and_me_works(server):

@@ -53,6 +53,7 @@ The interactive API docs are at http://localhost:8000/docs.
 | `POST /api/v1/conversation` | Start a conversation session |
 | `POST /api/v1/conversation/{id}/follow-up` | Ask a follow-up in context |
 | `GET /api/v1/citations/{passage_id}` | The stored text behind a citation (URL-encode the ID) |
+| `GET /api/v1/usage` | Today's question counts and limits: yours and the site's (UTC day) |
 
 ## Accounts
 

@@ -17,6 +17,8 @@ Environment overrides:
     DOCURESEARCH_LLM_API_KEY    (environment only)
     DOCURESEARCH_ALLOW_REGISTRATION  auth.allow_registration (true/false)
     DOCURESEARCH_COOKIE_SECURE       auth.cookie_secure (true/false)
+    DOCURESEARCH_QUESTIONS_PER_USER_PER_DAY  limits.questions_per_user_per_day
+    DOCURESEARCH_QUESTIONS_PER_SITE_PER_DAY  limits.questions_per_site_per_day
 """
 
 from __future__ import annotations
@@ -61,6 +63,9 @@ class Settings:
     allow_registration: bool = True
     session_lifetime_days: int = 7
     cookie_secure: bool = False  # set True when served over HTTPS
+    # Daily question limits (Story 9.1); 0 means unlimited.
+    questions_per_user_per_day: int = 0
+    questions_per_site_per_day: int = 0
     llm: LLMSettings = field(default_factory=LLMSettings)
 
     def __post_init__(self) -> None:
@@ -79,6 +84,10 @@ class Settings:
                 raise ConfigError(f"retrieval.{name} must be >= 0")
         if self.semantic_weight + self.keyword_weight == 0:
             raise ConfigError("retrieval weights must not both be 0")
+        for name in ("questions_per_user_per_day", "questions_per_site_per_day"):
+            value = getattr(self, name)
+            if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+                raise ConfigError(f"limits.{name} must be a whole number >= 0, got {value!r}")
 
     @classmethod
     def load(
@@ -112,6 +121,7 @@ class Settings:
         conversation = data.get("conversation", {})
         auth = data.get("auth", {})
         llm = data.get("llm", {})
+        limits = data.get("limits", {})
 
         db_path = Path(env.get("DOCURESEARCH_DB_PATH") or storage.get("db_path", cls.db_path))
         if not db_path.is_absolute():
@@ -133,6 +143,16 @@ class Settings:
             ),
             cookie_secure=_flag(
                 env.get("DOCURESEARCH_COOKIE_SECURE"), auth.get("cookie_secure", cls.cookie_secure)
+            ),
+            questions_per_user_per_day=_limit(
+                "questions_per_user_per_day",
+                env.get("DOCURESEARCH_QUESTIONS_PER_USER_PER_DAY"),
+                limits.get("questions_per_user_per_day", cls.questions_per_user_per_day),
+            ),
+            questions_per_site_per_day=_limit(
+                "questions_per_site_per_day",
+                env.get("DOCURESEARCH_QUESTIONS_PER_SITE_PER_DAY"),
+                limits.get("questions_per_site_per_day", cls.questions_per_site_per_day),
             ),
             llm=LLMSettings(
                 # Trimmed: Docker's --env-file keeps stray spaces (KEY= value),
@@ -177,6 +197,21 @@ def _flag(env_value: str | None, default: object) -> bool:
     if value in ("0", "false", "no", "off"):
         return False
     raise ConfigError(f"Expected true/false, got {env_value!r}")
+
+
+def _limit(name: str, env_value: str | None, default: object) -> int:
+    """A limit from an environment string (if set), else the TOML value as is.
+
+    Only the env string is parsed here; ``Settings.__post_init__`` validates
+    the value (rejecting booleans, non-integers and negatives rather than
+    coercing them: ``int(True) == 1`` and ``int(5.9) == 5``).
+    """
+    if _clean(env_value) is None:
+        return default  # type: ignore[return-value]
+    text = env_value.strip()
+    if not (text.isascii() and text.isdigit()):
+        raise ConfigError(f"limits.{name} must be a whole number >= 0, got {env_value!r}")
+    return int(text)
 
 
 def _clean(value: object) -> str | None:

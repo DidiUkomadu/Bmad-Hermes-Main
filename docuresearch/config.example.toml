@@ -24,6 +24,14 @@ session_lifetime_days = 7
 # Set to true when DocuResearch is served over HTTPS.
 cookie_secure = false
 
+[limits]
+# Questions sent to the model per UTC day (resets at 00:00 UTC). 0 = unlimited (the default).
+# A question counts only when it is sent to the model; answers given without a model call
+# (no passages retrieved) do not count. Follow-ups and conversation turns count too.
+# The public demo uses 5 per user and 40 per site.
+questions_per_user_per_day = 0
+questions_per_site_per_day = 0
+
 [llm]
 # Any OpenAI-compatible /chat/completions endpoint.
 # Nous Portal: https://inference-api.nousresearch.com/v1
