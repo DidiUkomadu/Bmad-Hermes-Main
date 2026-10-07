@@ -6,7 +6,8 @@
 #   retrospective: optional | done
 #
 # Sources: planning-artifacts/docuresearch-epics-stories.md (Epics 0–7) and
-# planning-artifacts/docuresearch-change-proposal-multi-user.md (Epic 8).
+# planning-artifacts/docuresearch-change-proposal-multi-user.md (Epic 8),
+# planning-artifacts/sprint-change-proposal-2026-10-07.md (Epic 9).
 # Deviations from the plan: implementation-artifacts/docuresearch-implementation-notes.md
 
 generated: 2026-10-05
@@ -89,3 +90,13 @@ development_status:
   8-5-sign-in-ui: done
   8-6-migration-of-existing-data: done
   epic-8-retrospective: optional
+
+  # Epic 9: Public beta on Hugging Face Spaces (sprint change proposal, 2026-10-07)
+  epic-9: backlog
+  9-1-daily-question-limits: backlog
+  9-2-openrouter-daily-cap-handling: backlog
+  9-3-upload-limits: backlog
+  9-4-sign-up-protection: backlog
+  9-5-privacy-notice-and-demo-banner: backlog
+  9-6-hugging-face-spaces-deployment: backlog
+  epic-9-retrospective: optional

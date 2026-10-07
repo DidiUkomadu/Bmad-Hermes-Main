@@ -20,9 +20,10 @@
 
 ## Deployment
 - **Local-first**, with a production path: Docker + docker compose with Caddy (automatic HTTPS). See `docuresearch/docs/deployment.md`.
+- **Public beta (Epic 9, planned):** Hugging Face Spaces free tier, OpenRouter free tier only (one shared key, 50 requests/day), open to anyone, with usage limits. See `_bmad-output/planning-artifacts/sprint-change-proposal-2026-10-07.md`.
 
 ## Status
-- **MVP complete (Epics 0–8).** Story status: `_bmad-output/implementation-artifacts/sprint-status.yaml`. Deviations from the plan, and why: `_bmad-output/implementation-artifacts/docuresearch-implementation-notes.md`.
+- **MVP complete (Epics 0–8). Epic 9 (public beta) approved, in backlog.** Story status: `_bmad-output/implementation-artifacts/sprint-status.yaml`. Deviations from the plan, and why: `_bmad-output/implementation-artifacts/docuresearch-implementation-notes.md`.
 
 ## BMad Output Structure
 - `_bmad-output/planning-artifacts/` — PRD, architecture, epics, stories
